@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./js/observer.js"></script>
+    <script src="./js/watcher.js"></script>
+    <script src="./js/templateCompiler.js"></script>
+    <script src="./js/mvvm.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <div v-text="message"></div>
+        <div v-text="info"></div>
+        {{ message }}
+        <input type="text" v-model="message"/>
+    </div>
+    <script>
+        var vm = new MiniVue({
+            el: '#app',
+            data: {
+                message: 'Hello, MiniVue',
+                info: 'Hello, world',
+            }
+        });
+    </script>
+</body>
+</html>
