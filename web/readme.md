@@ -8,3 +8,5 @@
         - [浏览器的工作原理：新式网络浏览器幕后揭秘](https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/)
   -  CSS/JS对于DOM解析和渲染的影响
         - [CSS/JS 阻塞 DOM 解析和渲染](https://harttle.land/2016/11/26/static-dom-render-blocking.html)
+  -  load/domContentLoaded事件、异步/延迟Js 与DOM解析
+        - [load/domContentLoaded事件、异步/延迟Js 与DOM解析](https://www.cnblogs.com/Bonnie3449/p/8419609.html)
