@@ -15,3 +15,5 @@
   -  Flex 布局教程
         - [Flex 布局教程：语法篇](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html)
         - [Flex 布局教程：实例篇](http://www.ruanyifeng.com/blog/2015/07/flex-examples.html)
+  - 前端路由原理
+    - [深度剖析：前端路由原理](https://juejin.im/post/5d469f1e5188254e1c49ae78)
