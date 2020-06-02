@@ -65,3 +65,38 @@ done
 双引号的优点：
 + 双引号里可以有变量
 + 双引号里可以出现转义字符
+
+##### 拼接字符串
+
+```sh
+your_name="shell"
+# 使用双引号拼接
+greeting="Hello, "$your_name" !"
+greeting1="Hello, ${your_name} !"
+
+echo $greeting $greeting1
+
+# 使用单引号拼接
+greeting2='Hello, '$your_name' !'
+greeting3='Hello, ${your_name} !'
+
+echo $greeting2 $greeting3
+
+# 输出
+# Hello, shell ! Hello, shell !
+# Hello, shell ! Hello, ${your_name} !
+```
+
+##### 获取字符串长度
+
+```sh
+string='shell'
+echo ${#string}
+```
+
+##### 提取字符串
+
+```sh
+string="Hello World"
+echo ${string:1:4} #输出 ello
+```
