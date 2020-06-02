@@ -6,10 +6,11 @@
   -  浏览器的工作原理
         - [图解浏览器的基本工作原理](https://zhuanlan.zhihu.com/p/47407398)
         - [浏览器的工作原理：新式网络浏览器幕后揭秘](https://www.html5rocks.com/zh/tutorials/internals/howbrowserswork/)
+        - [前端文摘：深入解析浏览器的幕后工作原理](https://www.cnblogs.com/lhb25/p/how-browsers-work.html)🔥
   -  CSS/JS对于DOM解析和渲染的影响
         - [CSS/JS 阻塞 DOM 解析和渲染](https://harttle.land/2016/11/26/static-dom-render-blocking.html)
   -  load/domContentLoaded事件、异步/延迟Js 与DOM解析
-        - [load/domContentLoaded事件、异步/延迟Js 与DOM解析](https://www.cnblogs.com/Bonnie3449/p/8419609.html)
+        - [load/domContentLoaded事件、异步/延迟Js 与DOM解析](https://www.cnblogs.com/Bonnie3449/p/8419609.html)🔥
   -  跨域资源共享 CORS 详解
         - [跨域资源共享 CORS 详解](http://www.ruanyifeng.com/blog/2016/04/cors.html)
   -  Flex 布局教程
