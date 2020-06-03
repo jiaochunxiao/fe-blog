@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>router-example</title>
+  <style type="text/css">
+  body {
+    padding: 10px;
+  }
+  #page {
+    height: 50px;
+  }
+  .menu-list {
+    list-style: none;
+  }
+  .menu-list > li {
+    line-height: 34px;
+    color: #4093ff;
+  }
+  .menu-list > li:hover {
+    text-decoration: underline;
+  }
+  </style>
+</head>
+<body>
+  <div id="page"></div>
+  <ul class="menu-list">
+    <li data-url='/'>/</li>
+    <li data-url='/page1'>page1</li>
+    <li data-url='/page2'>page2</li>
+    <li data-url='/page3'>page3</li>
+    <li data-url='1'>前进</li>
+    <li data-url='-1'>后退</li>
+  </ul>
+</body>
+</html>
