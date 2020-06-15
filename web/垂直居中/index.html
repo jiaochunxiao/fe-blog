@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>垂直居中</title>
+  <style type="text/css">
+  body {
+    text-align: center;
+  }
+  #main1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+  }
+  #main-child {
+    width: 50px;
+    height: 50px;
+    background-color: red;
+  }
+  #main2 {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-top: 10px;
+    background-color: red;
+  }
+  #main-child2 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    transform: translate(-50%, -50%);
+    background-color: orange;
+  }
+  #main3 {
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+    overflow: hidden;
+  }
+  #main-child3 {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    left: 50%;
+    margin-left: -25px;
+    margin-top: -25px;
+    background-color: red;
+  }
+  #main4 {
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+  }
+  #main-child4 {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    background-color: orange;
+  }
+  #main5 {
+    position: relative;
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+  }
+  #main-child5 {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: calc(50% - 25px);
+    right: calc(50% - 25px);
+    background-color: red;
+  }
+  #main6 {
+    display: grid;
+    margin-top: 10px;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+  }
+  #main-child6 {
+    align-self: center;
+    justify-self: center;
+    width: 50px;
+    height: 50px;
+    background-color: orange;
+  }
+  </style>
+</head>
+<body>
+  <div id="main1">
+    <div id="main-child"></div>
+  </div>
+  <div id="main2">
+    <div id="main-child2"></div>
+  </div>
+  <div id="main3">
+    <div id="main-child3"></div>
+  </div>
+  <div id="main4">
+    <div id="main-child4"></div>
+  </div>
+  <div id="main5">
+    <div id="main-child5"></div>
+  </div>
+  <div id="main6">
+    <div id="main-child6"></div>
+  </div>
+</body>
+</html>
