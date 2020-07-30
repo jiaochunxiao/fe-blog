@@ -11,5 +11,4 @@ class MiniVue {
             this.$compiler = new TemplateCompiler(this.$el, this.$vm);
         }
     }
-
 }

@@ -15,7 +15,7 @@ class Observer {
             this.defineReactive(data, key, data[key]);
         });
     }
-    // 
+    //
     defineReactive(obj, key, val) {
         const dep = new Dep();
         // 重新定义
