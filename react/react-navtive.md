@@ -16,5 +16,9 @@
 
 ### app开屏
 
+参考[react-native-splash-screen](https://github.com/crazycodeboy/react-native-splash-screen/blob/master/README.zh.md)
+
+#### ios
+
 
 ### 热更新
