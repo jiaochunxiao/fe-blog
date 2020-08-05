@@ -25,7 +25,9 @@
 
 ### 热更新
 
-[app-center(微软)]()
+[code-push](https://github.com/Microsoft/code-push)
+
+[app-center(微软)](https://appcenter.ms/)
 
 [code-push-server(自建)](https://github.com/lisong/code-push-server)
 
@@ -62,8 +64,15 @@ code-push deployment ls myRnApp -k
 
 + code-push login http://127.0.0.1:3000
 
+### 遇到的一些小问题
 
+#### clone下的项目npm install后仍报一些module缺失问题
+
++ watchman watch-del-all
++ rm -rf node_modules
++ yarn install
++ yarn start --reset-cache
 
 *参考文档*
 + []()
-+ [eact-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
++ [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
