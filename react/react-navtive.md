@@ -73,6 +73,25 @@ code-push deployment ls myRnApp -k
 + yarn install
 + yarn start --reset-cache
 
+#### react-native-http-cache
+
+在React Native 版本高于0.60后会有报错，'React/RCTDefines.h' file not found。
+解决办法：
+```
+#if __has_include("RCTDefines.h")
+  #import "RCTDefines.h"
+#else
+ #import <React/RCTDefines.h>
+#endif
+```
+
+#### Failed to open zip file. Gradle's dependency cache may be corrupt (this sometimes occurs after a network connection timeout.)
+
+更改gradle-wrapper.properties，
+```
+distributionUrl=https\://services.gradle.org/distributions/gradle-6.5.1-all.zip // 选择一个合适的版本
+```
+
 *参考文档*
 + []()
 + [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
