@@ -64,6 +64,20 @@ code-push deployment ls myRnApp -k
 
 + code-push login http://127.0.0.1:3000
 
+### 使用字体图标
+
+```
+import { createIconSetFromIcoMoon } from 'react-native-vector-icons'
+import icoMoonConfig from '@/assets/icomoon/selection.json'
+
+const Icon = createIconSetFromIcoMoon(icoMoonConfig, 'Icomoon', 'icomoon.ttf')
+export default Icon
+
+// export const Button = Icon.Button
+// export const TabBarItem = Icon.TabBarItem
+```
+
+
 ### 遇到的一些小问题
 
 #### clone下的项目npm install后仍报一些module缺失问题
