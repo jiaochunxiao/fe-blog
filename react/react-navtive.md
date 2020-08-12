@@ -77,6 +77,10 @@ export default Icon
 // export const TabBarItem = Icon.TabBarItem
 ```
 
+### react-native-swiper
+
+
+
 
 ### 遇到的一些小问题
 
@@ -89,6 +93,10 @@ export default Icon
 
 #### react-native-http-cache
 
+##### ios
+
+[react-native-http-cache](https://github.com/reactnativecn/react-native-http-cache)
+
 在React Native 版本高于0.60后会有报错，'React/RCTDefines.h' file not found。
 解决办法：
 ```
@@ -99,11 +107,22 @@ export default Icon
 #endif
 ```
 
+##### android
+
+[react native清除APP缓存的功能实现](https://zhuanlan.zhihu.com/p/75859814)
+
 #### Failed to open zip file. Gradle's dependency cache may be corrupt (this sometimes occurs after a network connection timeout.)
 
 更改gradle-wrapper.properties，
 ```
 distributionUrl=https\://services.gradle.org/distributions/gradle-6.5.1-all.zip // 选择一个合适的版本
+```
+
+#### Text 多行文本省略
+
+发现在未设置 flex: 1 前显示为单行带省略号，设置后生效。
+```
+<Text numberOfLines={2}>hellohellohellohellohellohellohellohellohellohello</Text>
 ```
 
 *参考文档*
