@@ -119,12 +119,15 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-6.5.1-all.zip 
 ```
 
 #### Text 多行文本省略
-
-发现在未设置 flex: 1 前显示为单行带省略号，设置后生效。
+设置 flex: 1 后可能会导致失效
 ```
 <Text numberOfLines={2}>hellohellohellohellohellohellohellohellohellohello</Text>
+
+####  TouchableWithoutFeedback
+
+TouchableWithoutFeedback 组件内直接渲染另外一个组件，可能导致onPress事件无法触发。
+
 ```
 
 *参考文档*
-+ []()
 + [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
