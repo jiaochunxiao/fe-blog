@@ -118,6 +118,8 @@ export default Icon
 distributionUrl=https\://services.gradle.org/distributions/gradle-6.5.1-all.zip // 选择一个合适的版本
 ```
 
+建议使用：[@yz1311/react-native-http-cache](https://github.com/yz1311/react-native-http-cach)，对react-native-http-cache的升级。
+
 #### Text 多行文本省略
 设置 flex: 1 后可能会导致失效
 ```
