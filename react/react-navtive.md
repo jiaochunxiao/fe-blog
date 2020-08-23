@@ -79,7 +79,12 @@ export default Icon
 
 ### react-native-swiper
 
+### ReactNative与原生通信
+#### ReactNative调用原生模块方法
 
+[参考](https://reactnative.cn/docs/native-modules-ios#content)
+```
+```
 
 
 ### 遇到的一些小问题
