@@ -79,6 +79,10 @@ export default Icon
 
 ### react-native-swiper
 
+### 自适应布局
+
+
+
 ### ReactNative与原生通信
 #### ReactNative调用原生模块方法
 
@@ -138,3 +142,4 @@ TouchableWithoutFeedback 组件内直接渲染另外一个组件，可能导致o
 
 *参考文档*
 + [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
++ [React Native 的默认单位和自适应布局方案](https://segmentfault.com/a/1190000004878644)
