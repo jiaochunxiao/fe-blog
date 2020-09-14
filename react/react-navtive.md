@@ -55,6 +55,9 @@ code-push常用命令：
 
 + code-push login
 + code-push app add myRnApp ios react-native / code-push app add myRnApp android react-native
++ code-push loout 注销
++ code-push access-key ls 列出登陆的token
++ code-push access-key rm <accessKye> 删除某个 access-key
 
 + 显示当前的版本信息
 code-push deployment ls myRnApp -k
@@ -144,4 +147,5 @@ TouchableWithoutFeedback 组件内直接渲染另外一个组件，可能导致o
 
 *参考文档*
 + [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
++ [CodePush 命令行](https://github.com/microsoft/code-push/blob/v3.0.1/cli/README-cn.md)
 + [React Native 的默认单位和自适应布局方案](https://segmentfault.com/a/1190000004878644)
