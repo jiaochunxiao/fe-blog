@@ -67,6 +67,24 @@ code-push deployment ls myRnApp -k
 
 + code-push login http://127.0.0.1:3000
 
+#### 发布更新
+
+两种方式：
++ code-push react-release(更简单)
+```bash
+code-push release-react MyApp-iOS ios
+code-push release-react MyApp-Android android
+code-push release-react test-code-push --t 1.0.0 --dev false --des "测试热更新" --m true
+# 参数--t为二进制(.ipa与apk)安装包的的版本；--dev为是否启用开发者模式(默认为false)；--d是要发布更新的环境分Production与Staging(默认为Staging)；--des为更新说明；--m 是强制更新。
+```
++ code-push release
+code-push release发布更新, 首先需要将js与图片资源进行打包成 bundle。
+```bash
+mkdir -p build/ios && react-native bundle --entry-file index.js --bundle-output ./build/ios/main.jsbundle --platform ios --dev false  --assets-dest ./build/ios
+
+code-push release-react test-code-push ./build/ios --t 1.0.0 --dev false --des "测试热更新" --m true
+```
+
 ### 使用字体图标
 
 ```
