@@ -67,6 +67,11 @@ code-push deployment ls myRnApp -k
 
 + code-push login http://127.0.0.1:3000
 
+#### 配置
+
++ [ios](https://github.com/microsoft/react-native-code-push/blob/master/docs/multi-deployment-testing-ios.md)
++ [android](https://github.com/microsoft/react-native-code-push/blob/master/docs/multi-deployment-testing-android.md)
+
 #### 发布更新
 
 两种方式：
