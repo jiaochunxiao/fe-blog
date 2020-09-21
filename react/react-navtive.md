@@ -72,6 +72,7 @@ code-push deployment ls myRnApp -k
 + [ios](https://github.com/microsoft/react-native-code-push/blob/master/docs/multi-deployment-testing-ios.md)
 + [android](https://github.com/microsoft/react-native-code-push/blob/master/docs/multi-deployment-testing-android.md)
 
+
 #### 发布更新
 
 两种方式：
@@ -87,7 +88,8 @@ code-push release发布更新, 首先需要将js与图片资源进行打包成 b
 ```bash
 mkdir -p build/ios && react-native bundle --entry-file index.js --bundle-output ./build/ios/main.jsbundle --platform ios --dev false  --assets-dest ./build/ios
 
-code-push release-react test-code-push ./build/ios --t 1.0.0 --dev false --des "测试热更新" --m true
+code-push release myAppIos ./build/ios '*' --des '测试热更新' --m true
+code-push release myAppAndroid ./build/android '*' --des '测试热更新' --m true
 ```
 
 ### 使用字体图标
