@@ -20,7 +20,7 @@ Shell 脚本（shell script），是一种为 shell 编写的脚本程序。
 
 ```sh
 first_world="Hello World"
-echo first_world
+echo $first_world
 
 # 只读变量
 your_name="Max"
@@ -37,6 +37,81 @@ unset your_name
 1) 局部变量 局部变量在脚本或命令中定义，仅在当前shell实例中有效，其他shell启动的程序不能访问局部变量。
 2) 环境变量 所有的程序，包括shell启动的程序，都能访问环境变量，有些程序需要环境变量来保证其正常运行。必要的时候shell脚本也可以定义环境变量。
 3) shell变量 shell变量是由shell程序设置的特殊变量。shell变量中有一部分是环境变量，有一部分是局部变量，这些变量保证了shell的正常运行
+
+#### 特殊变量
+
+|变量|含义|
+|:---|:---|
+|$0|当前脚本的名称|
+|$n|传递给脚本或函数的参数，n是一个数字，表示第几个参数。例如，第一个参数就是$1, 第二个参数是$2|
+|$#|传递给脚本或函数的参数个数|
+|$*|传递给脚本或函数的所有参数|
+|$@|传递给脚本或函数的所有参数。被双引号（""）包含时， 与$* 稍有不同|
+|$?|上个命令的退出状态或函数的返回值，0 表示没有错误，其他任何值表示有错误|
+|$$|当前shell进程ID，对于shell脚本，就是这些脚本所在的进程ID|
+|$!|后台运行的最后一个进程的ID号|
+
+*tips*
+>$* 和 $@ 都表示传递给函数或脚本的所有参数，不被双引号(" ")包含时，都以"$1" "$2" … "$n" 的形式输出所有参数。
+>但是当它们被双引号(" ")包含时，"$*" 会将所有的参数作为一个整体，以"$1 $2 … $n"的形式输出所有参数；"$@" 会将各个参数分开，以"$1" "$2" … "$n" 的形式输出所有参数。
+
+```bash
+echo "\$*"= $*
+echo "\"\$*\"=" "$*"
+
+echo "\$@"= $@
+echo "\"\$@\"=" "$@"
+
+echo "print each param from \$*"
+
+for var in $*
+do
+  echo "$var"
+done
+
+echo "print each param from \$@"
+
+for var in $@
+do
+  echo "$var"
+done
+
+echo "print each param from \"\$*\""
+
+for var in "$*"
+do
+  echo "$var"
+done
+
+echo "print each param from \"\$@\""
+
+for var in "$@"
+do
+  echo "$var"
+done
+# 输出
+# $*= a b c d
+# "$*"= a b c d
+# $@= a b c d
+# "$@"= a b c d
+# print each param from $*
+# a
+# b
+# c
+# d
+# print each param from $@
+# a
+# b
+# c
+# d
+# print each param from "$*"
+# a b c d
+# print each param from "$@"
+# a
+# b
+# c
+# d
+```
 
 ### Shell字符串
 
