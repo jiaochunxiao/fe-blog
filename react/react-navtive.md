@@ -81,7 +81,7 @@ code-push deployment ls myRnApp -k
 code-push release-react MyApp-iOS ios
 code-push release-react MyApp-Android android
 code-push release-react test-code-push --t 1.0.0 --dev false --des "测试热更新" --m true
-# 参数--t为二进制(.ipa与apk)安装包的的版本；--dev为是否启用开发者模式(默认为false)；--d是要发布更新的环境分Production与Staging(默认为Staging)；--des为更新说明；--m 是强制更新。
+# 参数--t为二进制(.ipa与apk)安装包的的版本；--dev为是否启用开发者模式(默认为false)；-d是要发布更新的环境分Production与Staging(默认为Staging)；--des为更新说明；--m 是强制更新。
 ```
 + code-push release
 code-push release发布更新, 首先需要将js与图片资源进行打包成 bundle。
