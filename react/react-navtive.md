@@ -170,6 +170,31 @@ TouchableWithoutFeedback 组件内直接渲染另外一个组件，可能导致o
 
 ```
 
+#### webview 注入js、css
+
+```javascript
+const INJECTEDJAVASCRIPT = `
+  const meta = document.createElement('meta');
+  meta.setAttribute('content', 'initial-scale=1, maximum-scale=1, user-scalable=0');
+  meta.setAttribute('name', 'viewport');
+  document.getElementsByTagName('head')[0].appendChild(meta);
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML="body{ margin: 0; padding: 0 }";
+  document.getElementsByTagName('HEAD').item(0).appendChild(style);
+`;
+
+<WebView
+  javaScriptEnabled={true}
+  scalesPageToFit={false}
+  injectedJavaScript={INJECTEDJAVASCRIPT}
+  source={{
+    html: `<img src="${imageNode.src}"
+    width="${imageWidth}" height="${imgHeight}" />`,
+  }}
+/>
+```
+
 *参考文档*
 + [react-native热更新之CodePush详细介绍及使用方法](https://blog.csdn.net/qq_33323251/article/details/79437932)
 + [CodePush 命令行](https://github.com/microsoft/code-push/blob/v3.0.1/cli/README-cn.md)
