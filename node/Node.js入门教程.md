@@ -288,9 +288,9 @@ module.exports 和 export 之间有什么区别？
 }
 ```
 
-#### 属性分类
+#### 主要属性简介
 
-##### name
+##### name ✨
 
 ```json
 {
@@ -320,7 +320,7 @@ module.exports 和 export 之间有什么区别？
 
 除作者外，该项目可以有一个或多个贡献者。此属性为数组结构。
 
-#### version
+#### version ✨
 
 指定 npm 包的当前版本。
 
@@ -334,7 +334,7 @@ Version 必须能够被 [node-semver](https://github.com/npm/node-semver) 解析
 }
 ```
 
-#### description
+#### description ✨
 
 对 npm 包的简短描述。它将被展示在 npm search, 这有助于开发者发现你的 package。
 
@@ -344,7 +344,7 @@ Version 必须能够被 [node-semver](https://github.com/npm/node-semver) 解析
 }
 ```
 
-#### keywords
+#### keywords ✨
 
 设置关键字，它是一个字符串数组。它将被列出在 npm search，这有助于开发者发现你的 package。
 
@@ -379,7 +379,7 @@ Version 必须能够被 [node-semver](https://github.com/npm/node-semver) 解析
 }
 ```
 
-#### licence
+#### licence ✨
 
 指定软件的许可证。
 
@@ -447,14 +447,171 @@ Version 必须能够被 [node-semver](https://github.com/npm/node-semver) 解析
 
 设置 package 的入口。
 
+当在应用程序中导入此 package 时，应用程序会在该位置搜索模块的导出。
+
 ```json
 {
   "main": "dist/vue.runtime.common.js"
 }
 ```
 
+#### browserslist
+
+如果你的 package 用户浏览器端，该字段用于说明，你的 package 支持的浏览器及其版本
+
+```json
+{
+  "browserslist": [
+    "Android >= 7",
+    "IOS >= 11",
+    "Safari >= 11",
+    "Chrome >= 49",
+    "Firefox >= 31",
+    "Samsung >= 5"
+  ]
+}
+
+// 以下配置说明需要支持使用率超过 %1的所有浏览器的最新的两个主版本，但不包含 IE8 及更低版本。
+{
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
+```
+#### scripts ✨
+
+scripts 指定了运行脚本命令的 npm 命令行的缩写。
+
+```json
+{
+  "scripts": {
+    "dev": "rollup -w -c scripts/config.js --environment TARGET:web-full-dev",
+    "dev:cjs": "rollup -w -c scripts/config.js --environment TARGET:web-runtime-cjs-dev",
+    "dev:esm": "rollup -w -c scripts/config.js --environment TARGET:web-runtime-esm",
+    "dev:test": "karma start test/unit/karma.dev.config.js",
+    "dev:ssr": "rollup -w -c scripts/config.js --environment TARGET:web-server-renderer"
+  }
+}
+```
+
+#### bin
+
+bin项用来指定各个内部命令对应的可执行文件的位置。
+
+```json
+{
+  "bin": {
+    "someTool": "./bin/someTool.js"
+  }
+}
+```
+上面代码指定，someTool 命令对应的可执行文件为 bin 子目录下的 someTool.js。Npm会寻找这个文件，在node_modules/.bin/目录下建立符号链接。在上面的例子中，someTool.js会建立符号链接node_modules/.bin/someTool。由于node_modules/.bin/目录会在运行时加入系统的PATH变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。
+
+因此，像下面这样的写法可以采用简写。
+```json
+{
+  "scripts": {
+    "start": "./node_modules/bin/someTool.js build"
+  }
+}
+// 简写为
+{
+  "scripts": {
+    "start": "someTool build"
+  }
+}
+```
+所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
+
+#### config
+
+config 对象可以用来设置 package 脚本中使用的配置参数。
+比如，一个 package 有如下配置：
+
+```json
+{
+  "name": "foo",
+  "config": {
+    "port": "8080"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+然后，在 server.js 脚本中可引用 config字段的值：
+```javascript
+http
+  .createServer(...)
+  .listen(process.env.npm_package_config_port)
+
+```
+然用户可通过执行 npm config set foo:port 8001 来覆盖。
+
+#### dependencies
+
+dependencies 字段指定了项目运行依赖的模块。
+
+该对象的各个成员分别有模块名和对应的版本组成，表示依赖模块及其版本范围。版本范围遵循[semver](https://docs.npmjs.com/cli/v6/using-npm/semver)
+
+```json
+{
+  "devDependencies": {
+    "browserify": "~13.0.0",
+    "karma-browserify": "~5.0.1"
+  }
+}
+```
+
+请不要在依赖对象中放置测试用例或者转译器。
+
+#### devDependencies
+
+devDependencies 字段指定了项目开发所需要的模块。
+
+该对象的各个成员分别有模块名和对应的版本组成，表示依赖模块及其版本范围。版本范围遵循[semver](https://docs.npmjs.com/cli/v6/using-npm/semver)
+
+#### peerDependencies
+
+该字段用来供插件指定去所需要的主工具的版本。
+
+> peerDependencies的目的是提示宿主环境去安装满足插件peerDependencies所指定依赖的包，然后在插件import或者require所依赖的包的时候，永远都是引用宿主环境统一安装的npm包，最终解决插件与所依赖包不一致的问题。
+
+举例，我们使用 element-ui, element-ui的 package.json中有如下配置：
+
+```json
+{
+  "peerDependencies": {
+    "vue": "^2.5.17"
+  }
+}
+```
+它要求宿主环境安装指定版本的 vue 版本。
+
+#### private
+
+如果设置为 true，则可以防止应用程序/软件包被意外发布到 npm 上。
+
+
+#### engines
+
+设置此 package 或 项目要运行的 Node.js 或其他命令的版本。
+
+```json
+{
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0",
+    "yarn": "^0.13.0"
+  }
+}
+```
 
 **参考**
 
 1. [node.js入门教程](http://nodejs.cn/learn)
 2. [package.json](https://docs.npmjs.com/cli/v6/configuring-npm/package-json#version)
+3. [package.json文件](https://javascript.ruanyifeng.com/nodejs/packagejson.html#toc4)
+4. [探讨npm依赖管理之peerDependencies](https://www.cnblogs.com/wonyun/p/9692476.html)
