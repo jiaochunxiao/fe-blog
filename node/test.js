@@ -33,40 +33,57 @@
 //   }
 // }, 100);
 
-const inquirer = require('inquirer');
+// const inquirer = require('inquirer');
 
-const questions = [
-  {
-    type: 'input',
-    name: 'name',
-    message: "What's your name?"
-  },
-  {
-    type: 'input',
-    name: 'age',
-    message: 'How old are you?'
-  },
-  {
-    type: 'list',
-    name: 'address',
-    choices: [
-      {
-        value: 1,
-        name: 'Beijing',
-      },
-      {
-        value: 2,
-        name: 'Qingdao',
-      },
-      {
-        value: 3,
-        name: 'Jinan'
-      }
-    ],
-    message: 'Where are you live now?'
-  }
-];
+// const questions = [
+//   {
+//     type: 'input',
+//     name: 'name',
+//     message: "What's your name?"
+//   },
+//   {
+//     type: 'input',
+//     name: 'age',
+//     message: 'How old are you?'
+//   },
+//   {
+//     type: 'list',
+//     name: 'address',
+//     choices: [
+//       {
+//         value: 1,
+//         name: 'Beijing',
+//       },
+//       {
+//         value: 2,
+//         name: 'Qingdao',
+//       },
+//       {
+//         value: 3,
+//         name: 'Jinan'
+//       }
+//     ],
+//     message: 'Where are you live now?'
+//   }
+// ];
 
-inquirer.prompt(questions).then(answers => {
-  console.log('%o', answers);
+// inquirer.prompt(questions).then(answers => {
+//   console.log('%o', answers);
+// });
+
+const p1 = new Promise((resolve, reject) => {
+  resolve({ name: 'promise'});
+}).catch(err => {
+  console.log('err 1');
+});
+
+p1.then(data => {
+  console.log(data);
+  throw new Error('throw error');
+}).catch(err => {
+  console.log('exceute');
+  console.error(err);
+}).catch(err => {
+  console.log('finally');
+  console.log(er);
 });
