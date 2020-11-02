@@ -71,19 +71,79 @@
 //   console.log('%o', answers);
 // });
 
-const p1 = new Promise((resolve, reject) => {
-  resolve({ name: 'promise'});
-}).catch(err => {
-  console.log('err 1');
+// const p1 = new Promise((resolve, reject) => {
+//   resolve({ name: 'promise'});
+// }).catch(err => {
+//   console.log('err 1');
+// });
+
+// p1.then(data => {
+//   console.log(data);
+//   throw new Error('throw error');
+// }).catch(err => {
+//   console.log('exceute');
+//   console.error(err);
+// }).catch(err => {
+//   console.log('finally');
+//   console.log(er);
+// });
+
+// const EventEmitter = require('events');
+// const eventEmitter = new EventEmitter();
+
+// eventEmitter.on('start', (number) => {
+//   console.log(number);
+// });
+
+// eventEmitter.emit('start', 7);
+
+const http = require('http');
+const port = 3000;
+const hostname = "localhost";
+
+const server = http.createServer((req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'text/plain');
+  res.write('test\n', 'utf-8');
+  res.end('Hello world!\n');
 });
 
-p1.then(data => {
-  console.log(data);
-  throw new Error('throw error');
-}).catch(err => {
-  console.log('exceute');
-  console.error(err);
-}).catch(err => {
-  console.log('finally');
-  console.log(er);
+// const options = {
+//   path: '/news/wap/fymap2020_data.d.json',
+//   method: 'GET',
+// };
+
+// const req = http.request('http://interface.sina.cn', options, res => {
+//   console.log(res.statusCode);
+//   res.on('data', d => {
+//     process.stdout.write(d);
+//   });
+// });
+
+// req.on('error', error => {
+//   console.error(error);
+// });
+
+// req.end();
+const https = require('https');
+const options = {
+  path: '/?service=App.Bing.Randstory',
+  method: 'POST',
+};
+
+const req = https.request('https://api.berryapi.net', options, res => {
+  console.log(res.statusCode);
+  res.on('data', d => {
+    process.stdout.write(d);
+  });
+});
+
+req.on('error', error => {
+  console.error(error);
+});
+
+req.end();
+
+server.listen(port, () => {
+  console.log(`Server is running at ${hostname}:${port}`);
 });
