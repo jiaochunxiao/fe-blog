@@ -97,16 +97,16 @@
 
 // eventEmitter.emit('start', 7);
 
-const http = require('http');
-const port = 3000;
-const hostname = "localhost";
+// const http = require('http');
+// const port = 3000;
+// const hostname = "localhost";
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.write('test\n', 'utf-8');
-  res.end('Hello world!\n');
-});
+// const server = http.createServer((req, res) => {
+//   res.statusCode = 200;
+//   res.setHeader('Content-Type', 'text/plain');
+//   res.write('test\n', 'utf-8');
+//   res.end('Hello world!\n');
+// });
 
 // const options = {
 //   path: '/news/wap/fymap2020_data.d.json',
@@ -115,8 +115,13 @@ const server = http.createServer((req, res) => {
 
 // const req = http.request('http://interface.sina.cn', options, res => {
 //   console.log(res.statusCode);
+//   let chunk = '';
 //   res.on('data', d => {
-//     process.stdout.write(d);
+//     chunk += d;
+//   });
+//   res.on('end', () => {
+//     console.log(chunk);
+//     console.log('end');
 //   });
 // });
 
@@ -125,25 +130,38 @@ const server = http.createServer((req, res) => {
 // });
 
 // req.end();
-const https = require('https');
-const options = {
-  path: '/?service=App.Bing.Randstory',
-  method: 'POST',
-};
+// // const https = require('https');
+// // const options = {
+// //   path: '/?service=App.Bing.Randstory',
+// //   method: 'POST',
+// // };
 
-const req = https.request('https://api.berryapi.net', options, res => {
-  console.log(res.statusCode);
-  res.on('data', d => {
-    process.stdout.write(d);
-  });
+// // const req = https.request('https://api.berryapi.net', options, res => {
+// //   console.log(res.statusCode);
+// //   res.on('data', d => {
+// //     process.stdout.write(d);
+// //   });
+// // });
+
+// // req.on('error', error => {
+// //   console.error(error);
+// // });
+
+// // req.end();
+
+// server.listen(port, () => {
+//   console.log(`Server is running at ${hostname}:${port}`);
+// });
+
+const p1 = new Promise((resolve, reject) => {
+  reject('reject')
 });
 
-req.on('error', error => {
-  console.error(error);
-});
-
-req.end();
-
-server.listen(port, () => {
-  console.log(`Server is running at ${hostname}:${port}`);
+p1.then(resolve => {
+  console.log(resolve);
+}, reject => {
+  console.log(reject);
+}).catch(err => {
+  console.log('err');
+  console.error(err);
 });

@@ -56,8 +56,12 @@ const options = {
 
 const req = https.request('https://api.berryapi.net', options, res => {
   console.log(res.statusCode);
+  let chunk = '';
   res.on('data', d => {
-    process.stdout.write(d);
+    chunk += d;
+  });
+  res.on('end', () => {
+    console.log(chunk);
   });
 });
 
