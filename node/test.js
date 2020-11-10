@@ -153,15 +153,64 @@
 //   console.log(`Server is running at ${hostname}:${port}`);
 // });
 
-const p1 = new Promise((resolve, reject) => {
-  reject('reject')
-});
+// const p1 = new Promise((resolve, reject) => {
+//   reject('reject')
+// });
 
-p1.then(resolve => {
-  console.log(resolve);
-}, reject => {
-  console.log(reject);
-}).catch(err => {
-  console.log('err');
-  console.error(err);
-});
+// p1.then(resolve => {
+//   console.log(resolve);
+// }, reject => {
+//   console.log(reject);
+//   console.log('----------');
+// }).catch(err => {
+//   console.log('err');
+//   console.error(err);
+// });
+
+function compareVersion(v1, v2) {
+  const v1arr = v1.split('.');
+  const v2arr = v2.split('.');
+  const len1 = v1arr.length;
+  const len2 = v2arr.length;
+  const max = len1 > len2 ? len1 : len2;
+  let i = 0;
+  for(; i < max; i++) {
+    const v1v = v1arr[i] ? parseInt(v1arr[i]) : 0;
+    const v2v = v2arr[i] ? parseInt(v2arr[i]) : 0;
+    if (v2v > v1v) {
+      return false;
+    }
+  }
+  return true;
+}
+
+console.log(compareVersion('1.0.1', '1.1.2'));
+console.log(compareVersion('0.0.1', '0.0.2'));
+console.log(compareVersion('1.1.0', '1.2.0'));
+console.log(compareVersion('1.2.1', '1.12.1'));
+console.log(compareVersion('1.1.12', '1.2'));
+
+function toNum(version) {
+  const versionArr = version.split('.');
+  const num_place = ['0000', '000', '00', '0', ''];
+  const len = versionArr.length;
+  for (let i = 0; i < len; i++) {
+    const itemLen = versionArr[i].length;
+    versionArr[i] = num_place[itemLen] + versionArr[i];
+  }
+  const res = versionArr.join('');
+  return res;
+};
+
+function compareVersion2(a, b) {
+  const version_a = toNum(a);
+  const version_b = toNum(b);
+  return version_a > version_b;
+}
+
+
+console.log(compareVersion2('1.0.1', '1.1.2'));
+console.log(compareVersion2('0.0.1', '0.0.2'));
+console.log(compareVersion2('1.1.0', '1.2.0'));
+console.log(compareVersion2('1.2.1', '1.12.1'));
+console.log(compareVersion2('1.1.12', '1.2'));
