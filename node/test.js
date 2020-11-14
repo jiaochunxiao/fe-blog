@@ -21,8 +21,8 @@
 
 // testTime();
 
-// const chalk = require('chalk');
-// console.log(chalk.yellow('Hello world!'));
+const chalk = require('chalk');
+console.log(chalk.yellow('Hello world!'));
 
 // const ProgressBar = require('progress');
 // const bar = new ProgressBar('downloading [:bar]', { total: 100 });
@@ -33,43 +33,43 @@
 //   }
 // }, 100);
 
-// const inquirer = require('inquirer');
+const inquirer = require('inquirer');
 
-// const questions = [
-//   {
-//     type: 'input',
-//     name: 'name',
-//     message: "What's your name?"
-//   },
-//   {
-//     type: 'input',
-//     name: 'age',
-//     message: 'How old are you?'
-//   },
-//   {
-//     type: 'list',
-//     name: 'address',
-//     choices: [
-//       {
-//         value: 1,
-//         name: 'Beijing',
-//       },
-//       {
-//         value: 2,
-//         name: 'Qingdao',
-//       },
-//       {
-//         value: 3,
-//         name: 'Jinan'
-//       }
-//     ],
-//     message: 'Where are you live now?'
-//   }
-// ];
+const questions = [
+  {
+    type: 'input',
+    name: 'name',
+    message: "What's your name?"
+  },
+  {
+    type: 'input',
+    name: 'age',
+    message: 'How old are you?'
+  },
+  {
+    type: 'list',
+    name: 'address',
+    choices: [
+      {
+        value: 1,
+        name: 'Beijing',
+      },
+      {
+        value: 2,
+        name: 'Qingdao',
+      },
+      {
+        value: 3,
+        name: 'Jinan'
+      }
+    ],
+    message: 'Where are you live now?'
+  }
+];
 
-// inquirer.prompt(questions).then(answers => {
-//   console.log('%o', answers);
-// });
+inquirer.prompt(questions).then(answers => {
+  console.log('%o', answers);
+});
 
 // const p1 = new Promise((resolve, reject) => {
 //   resolve({ name: 'promise'});
@@ -167,50 +167,50 @@
 //   console.error(err);
 // });
 
-function compareVersion(v1, v2) {
-  const v1arr = v1.split('.');
-  const v2arr = v2.split('.');
-  const len1 = v1arr.length;
-  const len2 = v2arr.length;
-  const max = len1 > len2 ? len1 : len2;
-  let i = 0;
-  for(; i < max; i++) {
-    const v1v = v1arr[i] ? parseInt(v1arr[i]) : 0;
-    const v2v = v2arr[i] ? parseInt(v2arr[i]) : 0;
-    if (v2v > v1v) {
-      return false;
-    }
-  }
-  return true;
-}
+// function compareVersion(v1, v2) {
+//   const v1arr = v1.split('.');
+//   const v2arr = v2.split('.');
+//   const len1 = v1arr.length;
+//   const len2 = v2arr.length;
+//   const max = len1 > len2 ? len1 : len2;
+//   let i = 0;
+//   for(; i < max; i++) {
+//     const v1v = v1arr[i] ? parseInt(v1arr[i]) : 0;
+//     const v2v = v2arr[i] ? parseInt(v2arr[i]) : 0;
+//     if (v2v > v1v) {
+//       return false;
+//     }
+//   }
+//   return true;
+// }
 
-console.log(compareVersion('1.0.1', '1.1.2'));
-console.log(compareVersion('0.0.1', '0.0.2'));
-console.log(compareVersion('1.1.0', '1.2.0'));
-console.log(compareVersion('1.2.1', '1.12.1'));
-console.log(compareVersion('1.1.12', '1.2'));
+// console.log(compareVersion('1.0.1', '1.1.2'));
+// console.log(compareVersion('0.0.1', '0.0.2'));
+// console.log(compareVersion('1.1.0', '1.2.0'));
+// console.log(compareVersion('1.2.1', '1.12.1'));
+// console.log(compareVersion('1.1.12', '1.2'));
 
-function toNum(version) {
-  const versionArr = version.split('.');
-  const num_place = ['0000', '000', '00', '0', ''];
-  const len = versionArr.length;
-  for (let i = 0; i < len; i++) {
-    const itemLen = versionArr[i].length;
-    versionArr[i] = num_place[itemLen] + versionArr[i];
-  }
-  const res = versionArr.join('');
-  return res;
-};
+// function toNum(version) {
+//   const versionArr = version.split('.');
+//   const num_place = ['0000', '000', '00', '0', ''];
+//   const len = versionArr.length;
+//   for (let i = 0; i < len; i++) {
+//     const itemLen = versionArr[i].length;
+//     versionArr[i] = num_place[itemLen] + versionArr[i];
+//   }
+//   const res = versionArr.join('');
+//   return res;
+// };
 
-function compareVersion2(a, b) {
-  const version_a = toNum(a);
-  const version_b = toNum(b);
-  return version_a > version_b;
-}
+// function compareVersion2(a, b) {
+//   const version_a = toNum(a);
+//   const version_b = toNum(b);
+//   return version_a > version_b;
+// }
 
 
-console.log(compareVersion2('1.0.1', '1.1.2'));
-console.log(compareVersion2('0.0.1', '0.0.2'));
-console.log(compareVersion2('1.1.0', '1.2.0'));
-console.log(compareVersion2('1.2.1', '1.12.1'));
-console.log(compareVersion2('1.1.12', '1.2'));
+// console.log(compareVersion2('1.0.1', '1.1.2'));
+// console.log(compareVersion2('0.0.1', '0.0.2'));
+// console.log(compareVersion2('1.1.0', '1.2.0'));
+// console.log(compareVersion2('1.2.1', '1.12.1'));
+// console.log(compareVersion2('1.1.12', '1.2'));
