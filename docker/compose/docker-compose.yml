@@ -1,0 +1,30 @@
+version: '3'
+services:
+  nginx:
+    build: ./nginx
+    # links:
+    #   - nodejs:nodejs
+    depends_on:
+      - nodejs
+      - nodejs1
+      - nodejs2
+    ports:
+      - "80:80"
+  nodejs:
+    build: ./node
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+  nodejs1:
+    build: ./node
+    ports:
+      - "8081:8081"
+    environment:
+      - PORT=8081
+  nodejs2:
+    build: ./node
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
