@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <h1>docker-nginx-nodejs</h1>
+  <img src="./docker.png" />
+  <div id="server"></div>
+
+  <script>
+    $(document).ready(function() {
+      $.ajax({
+        type: 'GET',
+        url: '/docker/get',
+        success: function(res) {
+          const result = typeof res === 'string' ? JSON.parse(res) : res;
+          const { code, port } = result;
+          if (code === 0) {
+            $('#server').text(`This respose is from port: ${port}`);
+            return;
+          }
+          console.log('error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -6,6 +6,6 @@ WORKDIR /src
 
 COPY . /src
 
-# EXPOSE 8080
+RUN npm install
 
 CMD ["pm2-docker", "process.yml"]

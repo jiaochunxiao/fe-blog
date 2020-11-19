@@ -1,6 +1,7 @@
 version: '3'
 services:
   nginx:
+    # TODO 打包镜像和运行容器最好是分开进行
     build: ./nginx
     # links:
     #   - nodejs:nodejs
@@ -8,9 +9,13 @@ services:
       - nodejs
       - nodejs1
       - nodejs2
+    volumes:
+      - ./nginx/app:/apps/
+      - ./nginx/conf:/etc/nginx/conf.d/
     ports:
       - "80:80"
   nodejs:
+    # 同上
     build: ./node
     ports:
       - "8080:8080"

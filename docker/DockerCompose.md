@@ -706,4 +706,114 @@ ulimits:
     hard: 40000
 ```
 
+#### volumes
 
+数据卷所挂载路径设置。可以设置为宿主机路径(HOST:CONTAINER)或者数据卷名称(VOLUME:CONTAINER)，并且可以设置访问模式 （HOST:CONTAINER:ro）。
+
+该指令中路径支持相对路径。
+```bash
+volumes:
+ - /var/lib/mysql
+ - cache/:/tmp/cache
+ - ~/configs:/etc/configs/:ro
+```
+
+如果路径为数据卷名称，必须在文件中配置数据卷：
+
+```bash
+version: "3"
+
+services:
+  my_src:
+    image: mysql:8.0
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+```
+
+#### 其他指令
+
+此外，还有包括 domainname, entrypoint, hostname, ipc, mac_address, privileged, read_only, shm_size, restart, stdin_open, tty, user, working_dir 等指令，基本跟 docker run 中对应参数的功能一致。
+
+指定服务容器启动后执行的入口文件。
+
+```bash
+entrypoint: /code/entrypoint.sh
+```
+
+指定容器中运行应用的用户名。
+
+```bash
+user: nginx
+```
+
+指定容器中工作目录。
+
+```bash
+working_dir: /code
+```
+
+指定容器中搜索域名、主机名、mac 地址等。
+
+```bash
+domainname: your_website.com
+hostname: test
+mac_address: 08-00-27-00-0C-0A
+```
+
+允许容器中运行一些特权命令。
+
+```bash
+privileged: true
+```
+
+指定容器退出后的重启策略为始终重启。该命令对保持服务始终运行十分有效，在生产环境中推荐配置为 always 或者 unless-stopped。
+
+```bash
+restart: always
+```
+
+以只读模式挂载容器的 root 文件系统，意味着不能对容器内容进行修改。
+
+```bash
+read_only: true
+```
+
+打开标准输入，可以接受外部输入。
+
+```bash
+stdin_open: true
+```
+
+模拟一个伪终端。
+
+```bash
+tty: true
+```
+
+#### 读取变量
+
+Compose 模板文件支持动态读取主机的系统环境变量和当前目录下的 .env 文件中的变量。
+
+例如，下面的 Compose 文件将从运行它的环境中读取变量 ${MONGO_VERSION} 的值，并写入执行的指令中。
+
+```bash
+version: "3"
+services:
+
+db:
+  image: "mongo:${MONGO_VERSION}"
+```
+
+如果执行 MONGO_VERSION=3.2 docker-compose up 则会启动一个 mongo:3.2 镜像的容器；如果执行 MONGO_VERSION=2.8 docker-compose up 则会启动一个 mongo:2.8 镜像的容器。
+
+若当前目录存在 .env 文件，执行 docker-compose 命令时将从该文件中读取变量。
+
+在当前目录新建 .env 文件并写入以下内容。
+
+```bash
+# 支持 # 号注释
+MONGO_VERSION=3.6
+```
