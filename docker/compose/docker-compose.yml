@@ -2,7 +2,8 @@ version: '3'
 services:
   nginx:
     # TODO 打包镜像和运行容器最好是分开进行
-    build: ./nginx
+    # build: ./nginx
+    image: nginx:v1
     # links:
     #   - nodejs:nodejs
     depends_on:
@@ -16,19 +17,22 @@ services:
       - "80:80"
   nodejs:
     # 同上
-    build: ./node
+    # build: ./node
+    image: node:v1
     ports:
       - "8080:8080"
     environment:
       - PORT=8080
   nodejs1:
-    build: ./node
+    # build: ./node
+    image: node:v1
     ports:
       - "8081:8081"
     environment:
       - PORT=8081
   nodejs2:
-    build: ./node
+    # build: ./node
+    image: node:v1
     ports:
       - "8082:8082"
     environment:
