@@ -34,33 +34,42 @@ Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及
 + 最自由的BSD协议
 
 
-#### 正向代理 & 反向代理
+#### 正向代理
 
 
+
+#### 反向代理
 
 #### 负载均衡
 
 
 ### nginx 常用命令
 
-+ nginx -v 查看版本
+|参数|含义|
+|---|---|
+|-?,-h|this help|
+|-v|show version and exit|
+|-V|show version and configure options then exit|
+|-t|test configuration and exit|
+|-T|test configuration, dump it and exit|
+|-q|suppress non-error messages during configuration testing|
+|-s signal|send signal to a master process: stop, quit, reopen, reload|
+|-p prefix|set prefix path (default: /etc/nginx/)|
+|-c filename|set configuration file (default: /etc/nginx/nginx.conf)|
+|-g directives|set global directives out of configuration file|
 
-```bash
-root@c598124ca7bf:/# nginx -v
-nginx version: nginx/1.19.4
-```
-
-+ nginx -s stop 关闭
-
-关闭 nginx
-
-+ nginx -s reload 重加载
-
-改变配置文件后，重新启动
 
 ### nginx配置文件
 
-查找位置：nginx -t
+#### 语法
+
++ 配置文件由指令与指令块构成
++ 每条指令以;分号结尾，指令与参数间以空格符合分割
++ 指令块以{} 大括号将多条指令组织在一起
++ include 语句允许组合多个配置文件以提升可维护性
++ 使用 # 符号添加注释，提高可读性
++ 使用 $ 符号使用变量
++ 部分指令的参数支持正则表达式
 
 #### nginx配置构成
 
@@ -81,3 +90,5 @@ events 主要影响 nginx 服务器与用户网络的链接
 nginx中配置最频繁的部分。
 
 http分文全局块，server 块。
+
+#### ngx_http_core_module 模块提供的变量
