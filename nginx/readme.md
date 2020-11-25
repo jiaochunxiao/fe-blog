@@ -4,6 +4,10 @@
 
 Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及电子邮件（IMAP/POP3）代理服务器。
 
+由伊戈尔·赛索耶夫创建并于2004年首次公开发布。2011年成立同名公司以提供支持。2019年3月11日，Nginx公司被F5 Networks以6.7亿美元收购。
+
+Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部分Web服务器使用Nginx，通常作为负载均衡器。
+
 ![web server市场份额统计](image/nginx_server_history.png)
 
 ![2020年10月web server市场份额](image/nginx_market.png)
@@ -205,25 +209,60 @@ Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及
 
 + 全局块
 
-从配置文件开始到events之间的模块。配置
+  从配置文件开始到events之间的模块配置
 
-```bash
-work_process: auto | 4;
-```
+  ```bash
+  user
+  work_process: auto | 4;
+  ```
 
 + events
 
-events 主要影响 nginx 服务器与用户网络的链接
+  events 主要影响 nginx 服务器与用户网络的链接
+  ```bash
+  events {
+    use epoll;
+    work_connections 65535;
+    # ...
+  }
+  ```
 
 + http
 
-nginx中配置最频繁的部分。
+  nginx中配置最频繁的部分。
 
-http分文全局块，server 块。
+  http分为全局块，server 块。
+  ```bash
+  http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    upstream node_cluster {
+      server 10.16.48.158:8080;
+      server 10.16.48.158:8081;
+      server 10.16.48.158:8082;
+    }
+    server {
+      server_name docker.test;
+      listen 80;
+      index index.html index.htm;
+      root /apps/;
+      location ~ /docker/ {
+        proxy_pass http://node_cluster;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+      }
+      access_log  /var/log/nginx/docker.test.log;
+      error_log  /var/log/nginx/docker.test.error.log;
+    }
+  }
+  ```
 
-#### ngx_http_core_module 模块提供的变量
+
 
 *参考*
++ [nginx中文文档](https://www.nginx.cn/doc/)
 + [Nginx开发从入门到精通](http://tengine.taobao.org/book/index.html#)
 + [终于有人把正向代理和反向代理解释的明明白白了](https://cloud.tencent.com/developer/article/1418457)
-+ []()
