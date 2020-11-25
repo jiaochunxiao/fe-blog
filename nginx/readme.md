@@ -13,6 +13,95 @@ Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及
 + Google：谷歌自主开发的 Google Web Server，简称 gws 。
 + nginx：由伊戈尔·赛索耶夫为俄罗斯访问量第二的 Rambler.ru 站点开发的，免费开源、轻量级、高性能 Web 服务器。
 
+#### Tengine
+
+[Tengine](http://tengine.taobao.org/)
+
+> Tengine是由淘宝网发起的Web服务器项目。它在Nginx的基础上，针对大访问量网站的需求，添加了很多高级功能和特性。Tengine的性能和稳定性已经在大型的网站如淘宝网，天猫商城等得到了很好的检验。它的最终目标是打造一个高效、稳定、安全、易用的Web平台。
+
+#### OpenResty
+
+[OpenResty](https://openresty.org/cn/)
+
+> OpenResty® 是一个基于 Nginx 与 Lua 的高性能 Web 平台，其内部集成了大量精良的 Lua 库、第三方模块以及大多数的依赖项。用于方便地搭建能够处理超高并发、扩展性极高的动态 Web 应用、Web 服务和动态网关。
+
+#### 国内主流网站的使用情况
+
++ 百度主页
+
+  ```bash
+  $ curl -I https://www.baidu.com/
+  HTTP/1.1 200 OK
+  Accept-Ranges: bytes
+  Cache-Control: private, no-cache, no-store, proxy-revalidate, no-transform
+  Connection: keep-alive
+  Content-Length: 277
+  Content-Type: text/html
+  Date: Tue, 24 Nov 2020 09:23:21 GMT
+  Etag: "575e1f5d-115"
+  Last-Modified: Mon, 13 Jun 2016 02:50:05 GMT
+  Pragma: no-cache
+  Server: bfe/1.0.8.18
+  ```
++ 淘宝主站
+
+  ```bash
+  $ curl -I https://www.taobao.com/
+  HTTP/2 200
+  server: Tengine
+  ...
+  ```
++ 腾讯主站
+
+  ```bash
+  $ curl -I https://www.qq.com/
+  HTTP/2 200
+  date: Tue, 24 Nov 2020 09:26:35 GMT
+  content-type: text/html; charset=GB2312
+  server: squid/3.5.24
+  ...
+  ```
++ 腾讯邮箱
+
+  ```bash
+  $ curl -I https://mail.qq.com/
+  HTTP/2 200
+  server: nginx
+  ...
+  ```
++ 新浪
+
+  ```bash
+  $ curl -I https://sina.com/
+  HTTP/1.1 200 OK
+  Server: nginx/1.13.7
+  ...
+  ```
+
++ 头条
+
+  ```bash
+  $ curl -I https://www.toutiao.com/
+  HTTP/2 200
+  server: Tengine
+  ...
+  ```
++ 京东
+
+  ```bash
+  $ curl -I https://www.jd.com/
+  HTTP/1.1 200 OK
+  Server: nginx
+  ...
+  ```
++ 美团
+
+  ```bash
+  $ curl -I https://www.meituan.com/
+  HTTP/1.1 302 Moved Temporarily
+  Server: openresty
+  ```
+
 #### 为什么选择 nginx？
 
 + 更快
@@ -38,10 +127,27 @@ Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及
 
 ![正向代理](image/forward_proxy.png)
 
+正向代理是一个位于客户端和目标服务器之间的服务器(代理服务器)，为了从目标服务器取得内容，客户端向代理服务器发送一个请求并指定目标，然后代理服务器向目标服务器转交请求并将获得的内容返回给客户端。
+
+为什么要使用正向代理：
+
++ 突破访问限制
+
+  比如我们日常使用VPN来访问国外网站
+
++ 提高访问速度
+
+  通常代理服务器都设置一个较大的硬盘缓冲区，会将部分请求的响应保存到缓冲区中，当其他用户再访问相同的信息时， 则直接由缓冲区中取出信息，传给用户，以提高访问速度。
+
++ 隐藏客户端真实IP
+
 
 #### 反向代理
 
 ![反向代理](image/reverse_proxy.png)
+
+反向代理是指以代理服务器来接受internet上的连接请求，然后将请求转发给内部网络上的服务器，并将从服务器上得到的结果返回给internet上请求连接的客户端，此时代理服务器对外就表现为一个反向代理服务器。
+
 
 为什么使用反向代理?
 
@@ -52,7 +158,13 @@ Nginx (engine x) 是一款轻量级的 Web 服务器 、反向代理服务器及
 
 #### 正向代理与反向代理的区别
 
-正向代理和反向代理的主要区别在于代理的对象不同。正向代理代理的是客户端，反向代理代理的是服务端。
++ 正向代理和反向代理的区别在于代理的对象不同。正向代理代理的是客户端，反向代理代理的是服务端。
+
++ 正向代理一般是在客户端架设，比如安装代理软件等，反向代理一般是服务端架设。
+
++ 正向代理中，服务器不知道真正的客户端到底是谁，以为访问自己的就是真实的客户端。而在反向代理中，客户端不知道真正的服务器是谁，以为自己访问的就是真实的服务器
+
++ 正向代理和反向代理的作用和目的不同。正向代理主要是用来解决访问限制问题。而反向代理则是提供负载均衡、安全防护等作用。二者均能提高访问速度。
 
 #### 负载均衡
 
@@ -110,3 +222,8 @@ nginx中配置最频繁的部分。
 http分文全局块，server 块。
 
 #### ngx_http_core_module 模块提供的变量
+
+*参考*
++ [Nginx开发从入门到精通](http://tengine.taobao.org/book/index.html#)
++ [终于有人把正向代理和反向代理解释的明明白白了](https://cloud.tencent.com/developer/article/1418457)
++ []()
