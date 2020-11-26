@@ -195,6 +195,42 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 
 ### nginx配置文件
 
+#### demo
+
+```bash
+user  nginx;
+worker_processes  1;
+
+error_log  /var/log/nginx/error.log warn;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+```
+
 #### 语法
 
 + 配置文件由指令与指令块构成
@@ -209,7 +245,7 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 
 + 全局块
 
-  从配置文件开始到events之间的模块配置
+  从配置文件开始到events之间的模块配置，配置影响nginx全局的指令。一般有运行nginx服务器的用户组，nginx进程pid存放路径，日志存放路径，配置文件引入，允许生成worker process数等。
 
   ```bash
   user
@@ -218,7 +254,7 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 
 + events
 
-  events 主要影响 nginx 服务器与用户网络的链接
+  events 主要影响 nginx 服务器与用户网络的链接。有每个进程的最大连接数，选取哪种事件驱动模型处理连接请求，是否允许同时接受多个网路连接，开启多个网络连接序列化等
   ```bash
   events {
     use epoll;
@@ -229,7 +265,7 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 
 + http
 
-  nginx中配置最频繁的部分。
+  nginx中配置最频繁的部分。可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。
 
   http分为全局块，server 块。
   ```bash
@@ -260,9 +296,116 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
   }
   ```
 
+#### 全局块
+
+
+#### events 配置模块
+#### http 配置模块
+
+### nginx负载均衡的几种方法
+
+#### 轮询(round-robin)
+
+每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉，能自动剔除
+
+```bash
+upstream node_cluster {
+    server 10.16.48.158:8080;
+    server 10.16.48.158:8081;
+    server 10.16.48.158:8082;
+}
+server {
+    ...
+    location ~ /docker/ {
+        proxy_pass http://node_cluster;
+    }
+    ...
+}
+```
+
+#### 加权轮询
+
+```
+upstream node_cluster {
+    server 10.16.48.158:8080 weight=2;
+    server 10.16.48.158:8081 weight=1;
+    server 10.16.48.158:8082 weight=1;
+}
+server {
+    ...
+    root /apps/;
+    location ~ /docker/ {
+        proxy_pass http://node_cluster;
+        ...
+    }
+}
+```
+
+#### ip-hash
+
+根据每个请求的ip的hash结果分配，因此每个固定ip能访问到同一个后端服务器，可以解决session问题。
+
+```config
+upstream node_cluster {
+    ip_hash;
+    server 10.16.48.158:8080;
+    server 10.16.48.158:8081;
+    server 10.16.48.158:8082;
+}
+server {
+    ...
+    root /apps/;
+    location ~ /docker/ {
+        proxy_pass http://node_cluster;
+        ...
+    }
+}
+```
+
+#### 热备
+
+```bash
+upstream node_cluster {
+    ip_hash;
+    server 10.16.48.158:8080;
+    server 10.16.48.158:8081;
+    server 10.16.48.158:8082 back;
+}
+```
+
+#### 其他的一些方式
++ fair（第三方）
+
+  按照后端服务器的响应时间来分配请求，响应时间短的优先分配。
+  ```bash
+  upstream favresin{
+      server 10.0.0.10:8080;
+      server 10.0.0.11:8080;
+      fair;
+  }
+  ```
++ url_hash（第三方）
+
+  按访问url的hash结果来分配请求，使每个url定向到同一个后端服务器，后端服务器为缓存时比较有效。
+  ```bash
+  upstream resinserver{
+      server 10.0.0.10:7777;
+      server 10.0.0.11:8888;
+      hash $request_uri;
+      hash_method crc32;
+  }
+  ```
+#### 参数解释
+
++ down，表示当前的server暂时不参与负载均衡。
++ backup，预留的备份机器。当其他所有的非backup机器出现故障或者忙的时候，才会请求backup机器，因此这台机器的压力最轻。
++ max_fails，允许请求失败的次数，默认为1。当超过最大次数时，返回proxy_next_upstream 模块定义的错误。
++ fail_timeout，请求失败超时时间，在经历了max_fails次失败后，暂停服务的时间。max_fails和fail_timeout可以一起使用
+
 
 
 *参考*
 + [nginx中文文档](https://www.nginx.cn/doc/)
 + [Nginx开发从入门到精通](http://tengine.taobao.org/book/index.html#)
 + [终于有人把正向代理和反向代理解释的明明白白了](https://cloud.tencent.com/developer/article/1418457)
++ [nignx 负载均衡的几种算法介绍](https://www.cnblogs.com/lvgg/p/6140584.html)
