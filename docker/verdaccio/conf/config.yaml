@@ -43,8 +43,12 @@ i18n:
 # a list of other known repositories we can talk to
 #
 uplinks:
-  npmjs:
+  cnpmjs:
     url: http://registry.npm.taobao.org/
+    # 是否设置缓存
+    cache: false
+  npmjs:
+    url: https://registry.npmjs.org/
 
 packages:
   '@*/*':

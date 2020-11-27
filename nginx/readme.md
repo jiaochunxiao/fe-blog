@@ -296,11 +296,8 @@ http {
   }
   ```
 
-#### 全局块
+#### http模块配置
 
-
-#### events 配置模块
-#### http 配置模块
 
 ### nginx负载均衡的几种方法
 
@@ -409,3 +406,5 @@ upstream node_cluster {
 + [Nginx开发从入门到精通](http://tengine.taobao.org/book/index.html#)
 + [终于有人把正向代理和反向代理解释的明明白白了](https://cloud.tencent.com/developer/article/1418457)
 + [nignx 负载均衡的几种算法介绍](https://www.cnblogs.com/lvgg/p/6140584.html)
++ [hash 算法原理及应用漫谈](https://www.cnblogs.com/sunsky303/p/11865321.html)
++ [Alphabetical index of variables](http://nginx.org/en/docs/varindex.html)

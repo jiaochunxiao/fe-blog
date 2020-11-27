@@ -1,5 +1,5 @@
 {
-  "name": "weishi-demo",
+  "name": "@cnpm/weishi-demo",
   "version": "0.0.1",
   "description": "weishi-demo 测试",
   "main": "index.js",
