@@ -1,0 +1,80 @@
+#
+# This is the config file used for the docker images.
+# It allows all users to do anything, so don't use it on production systems.
+#
+# Do not configure host and port under `listen` in this file
+# as it will be ignored when using docker.
+# see https://github.com/verdaccio/verdaccio/blob/master/wiki/docker.md#docker-and-custom-port-configuration
+#
+# Look here for more config file examples:
+# https://github.com/verdaccio/verdaccio/tree/master/conf
+#
+
+# path to a directory with all packages 所有包的路径
+storage: /verdaccio/storage
+
+# 认证，默认的授权是基于htpasswd 并且是内置的。 您可以通过plugins来修改此行为。
+auth:
+  htpasswd:
+    file: /verdaccio/conf/htpasswd
+    # Maximum amount of users allowed to register, defaults to "+inf".
+    # You can set this to -1 to disable registration.
+    #max_users: 1000
+    max_users: -1
+# 启用安全令牌， 下面是用的JWT（JSON Web Token)，需要将JWT模块添加到API部分。
+security:
+  api:
+    jwt:
+      sign:
+        expiresIn: 60d
+        notBefore: 1
+  web:
+    sign:
+      expiresIn: 7d
+
+web:
+  enabled: true
+  title: '微师-FE-私有仓库'
+  gravatar: true
+
+i18n:
+  web: zh-CN
+
+# a list of other known repositories we can talk to
+#
+uplinks:
+  npmjs:
+    url: http://registry.npm.taobao.org/
+
+packages:
+  '@*/*':
+    # scoped packages
+    # $all 允许所有人访问私有包 $authenticated已授权（已登录用户）
+    access: $all
+    publish: $all
+    proxy: npmjs
+
+  '**':
+    # allow all users (including non-authenticated users) to read and
+    # publish all packages
+    #
+    # you can specify usernames/groupnames (depending on your auth plugin)
+    # and three keywords: "$all", "$anonymous", "$authenticated"
+    access: $all
+
+    # allow all known users to publish packages
+    # (anyone can register by default, remember?)
+    publish: $all
+
+    # if package is not available locally, proxy requests to 'npmjs' registry
+    proxy: npmjs
+
+# To use `npm audit` uncomment the following section
+middlewares:
+  audit:
+    enabled: true
+
+# log settings
+logs:
+  - { type: stdout, format: pretty, level: trace }
+  #- {type: file, path: verdaccio.log, level: info}

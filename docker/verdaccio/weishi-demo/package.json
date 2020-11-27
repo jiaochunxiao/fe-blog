@@ -1,0 +1,11 @@
+{
+  "name": "weishi-demo",
+  "version": "0.0.1",
+  "description": "weishi-demo 测试",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "weishife",
+  "license": "ISC"
+}

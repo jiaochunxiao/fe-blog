@@ -1,0 +1,51 @@
+{
+	"name": "weishi-demo",
+	"versions": {
+		"0.0.1": {
+			"name": "weishi-demo",
+			"version": "0.0.1",
+			"description": "weishi-demo 测试",
+			"main": "index.js",
+			"scripts": {
+				"test": "echo \"Error: no test specified\" && exit 1"
+			},
+			"author": {
+				"name": "weishife"
+			},
+			"license": "ISC",
+			"readmeFilename": "readme.md",
+			"_id": "weishi-demo@0.0.1",
+			"_nodeVersion": "12.13.0",
+			"_npmVersion": "6.14.8",
+			"maintainers": [
+				{}
+			],
+			"dist": {
+				"integrity": "sha512-FhlfJVmYGdQyKgAia94vCuSpIrRSYBygnvoliELMmE+ZBgm/76oUOauUig7BJLAvB7yvo7ZzxvWJnAneslNHkw==",
+				"shasum": "c6447259c288c5713c75c9b7a60fed02386cf1e8",
+				"tarball": "http://localhost:4873/weishi-demo/-/weishi-demo-0.0.1.tgz"
+			},
+			"contributors": []
+		}
+	},
+	"time": {
+		"modified": "2020-11-27T07:17:21.135Z",
+		"created": "2020-11-27T07:17:21.135Z",
+		"0.0.1": "2020-11-27T07:17:21.135Z"
+	},
+	"users": {},
+	"dist-tags": {
+		"latest": "0.0.1"
+	},
+	"_uplinks": {},
+	"_distfiles": {},
+	"_attachments": {
+		"weishi-demo-0.0.1.tgz": {
+			"shasum": "c6447259c288c5713c75c9b7a60fed02386cf1e8",
+			"version": "0.0.1"
+		}
+	},
+	"_rev": "3-deca10dfe0bdc16b",
+	"_id": "weishi-demo",
+	"readme": "## weishi-demo\n\n这是一个测试包"
+}
