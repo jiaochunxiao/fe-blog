@@ -153,19 +153,20 @@ inquirer.prompt(questions).then(answers => {
 //   console.log(`Server is running at ${hostname}:${port}`);
 // });
 
-// const p1 = new Promise((resolve, reject) => {
-//   reject('reject')
-// });
+const p1 = new Promise((resolve, reject) => {
+  reject('reject')
+});
 
-// p1.then(resolve => {
-//   console.log(resolve);
-// }, reject => {
-//   console.log(reject);
-//   console.log('----------');
-// }).catch(err => {
-//   console.log('err');
-//   console.error(err);
-// });
+p1.then(resolve => {
+  console.log(resolve);
+}, reject => {
+  console.log(reject);
+  console.log('----------');
+  throw Error({error: 'test'})
+}).catch(err => {
+  console.log('err');
+  console.error(err.toString());
+});
 
 // function compareVersion(v1, v2) {
 //   const v1arr = v1.split('.');
