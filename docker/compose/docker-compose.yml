@@ -15,6 +15,7 @@ services:
       - ./nginx/conf:/etc/nginx/conf.d/
     ports:
       - "80:80"
+      - "9000:9000"
   nodejs:
     # 同上
     # build: ./node
@@ -27,9 +28,9 @@ services:
     # build: ./node
     image: node:v1
     ports:
-      - "8081:8081"
+      - "8083:8083"
     environment:
-      - PORT=8081
+      - PORT=8083
   nodejs2:
     # build: ./node
     image: node:v1
