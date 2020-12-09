@@ -29,6 +29,10 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 
 > OpenResty® 是一个基于 Nginx 与 Lua 的高性能 Web 平台，其内部集成了大量精良的 Lua 库、第三方模块以及大多数的依赖项。用于方便地搭建能够处理超高并发、扩展性极高的动态 Web 应用、Web 服务和动态网关。
 
+> OpenResty 通过汇聚各种设计精良的 Nginx 模块（主要由 OpenResty 团队自主开发），从而将 Nginx 有效地变成一个强大的通用 Web 应用平台。这样，Web 开发人员和系统工程师可以使用 Lua 脚本语言调动 Nginx 支持的各种 C 以及 Lua 模块，快速构造出足以胜任 10K 乃至 1000K 以上单机并发连接的高性能 Web 应用系统。
+
+> OpenResty 的目标是让你的Web服务直接跑在 Nginx 服务内部，充分利用 Nginx 的非阻塞 I/O 模型，不仅仅对 HTTP 客户端请求,甚至于对远程后端诸如 MySQL、PostgreSQL、Memcached 以及 Redis 等都进行一致的高性能响应。
+
 #### 国内主流网站的使用情况
 
 + 百度主页
@@ -193,6 +197,20 @@ Nginx是免费的开源软件，根据类BSD许可证的条款发布。一大部
 |-g directives|set global directives out of configuration file|
 
 
+### nginx模块
+
+Nginx是模块化架构的服务，丰富的模块，松散耦合。
+
+|模块名称|说明|
+|---|---|
+|内核模块|实现了底层的通讯协议，为其他模块/进程构建运行环境、协作基础，打开listen 的端口，启动worker进程|
+|HTTP/Mail模块|两个特殊模块，位于内核模块和各功能模块间；在内核模块之上实现了另一层的抽象；处理HTTP/MAIL协议事件；确保调用功能模块顺序正确。|
+|Event模块|负责监听accept后建立的连接，对读写事件进行添加删除；与非阻塞 I/O 模型结合使用；支持select/poll/epoll/kqueue等；注意惊群效应|
+|Handler模块|负责接受客户端请求并产生输出；通过配置文件中location指令配置 content handler 模块。|
+|Filter模块|负责输出内容处理，修改输出内容；Fiter模块在获取回复内容之后，向用户发送响应之前，执行处理动作；调用顺序在编译时就确定了。|
+|Upstream模块|实现反向代理的功能，负责将请求转发到后端服务器上，并读取响应，发回客户端；跨越单机的限制，完成网络数据的接收、处理和转发。|
+|LoadBalancer模块|根据配置指定算法，在众多的后端服务器中选择一个，完成请求的转发服务器|
+
 ### nginx配置文件
 
 #### demo
@@ -230,6 +248,16 @@ http {
     include /etc/nginx/conf.d/*.conf;
 }
 ```
++ 第一部分 全局块
+主要设置一些影响 nginx 服务器整体运行的配置指令。
+比如： worker_processes 1; ， worker_processes 值越大，可以支持的并发处理量就越多。
++ 第二部分 events块
+events 块涉及的指令主要影响Nginx服务器与用户的网络连接。
+比如： worker_connections 1024; ，支持的最大连接数。
++ 第三部分 http块
+http 块又包括 http 全局块和 server 块，是服务器配置中最频繁的部分，包括配置代理、缓存、日志定义等绝大多数功能。
+server块：配置虚拟主机的相关参数。
+location块：配置请求路由，以及各种页面的处理情况。
 
 #### 语法
 
@@ -242,6 +270,18 @@ http {
 + 部分指令的参数支持正则表达式
 
 #### nginx配置构成
+
+|域名称|域类型|域说明|
+|---|---|---|
+|main|全局域|Nginx 的根级别指令区域。该区域的配置指令是全局有效的，该指令名为隐性显示，nginx.conf 的整个文件内容都写在该指令域中|
+|events|指令域|Nginx 事件驱动相关的配置指令域|
+|http|指令域|Nginx HTTP 核心配置指令域，包含客户端完整 HTTP 请求过程中每个过程的处理方法的配置指令|
+|upstream|指令域|用于定义被代理服务器组的指令区域，也称“上游服务器”|
+|server|指令域|Nginx 用来定义服务 IP、绑定端口及服务相关的指令区域|
+|location|指令域|对用户 URI 进行访问路由处理的指令区域|
+|stream|指令域|Nginx 对 TCP 协议实现代理的配置指令域|
+|types|指令域|定义被请求文件扩展名与 MIME 类型映射表的指令区域|
+|if|指令域|按照选择条件判断为真时使用的配置指令域|
 
 + 全局块
 
@@ -267,7 +307,10 @@ http {
 
   nginx中配置最频繁的部分。可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。
 
-  http分为全局块，server 块。
+  http 块又包括 http 全局块和 server 块，是服务器配置中最频繁的部分，包括配置代理、缓存、日志定义等绝大多数功能。
+  server块：配置虚拟主机的相关参数。
+  location块：配置请求路由，以及各种页面的处理情况。
+
   ```bash
   http {
     include       mime.types;
@@ -296,8 +339,49 @@ http {
   }
   ```
 
-#### http模块配置
+#### Demo
 
+```
++ 配置nginx缓存
+
+```bash
+# http 区域下添加缓存区配置
+# inactivie=60s 表示60s内没有被访问的文件会被 cache manager 删除
+# proxy_cache_path 指定缓存文件目录，和 proxy_temp_path 最好设置在同一文件分区下，缓存内容是先写在 temp_path，然后移动到 cache_path，不同文件分区会影响性能。
+# keys_zone 命名并设置缓存的内存空间大小，要注意的是这个内存空间并不保存缓存文件，而是缓存文件的元信息(meta information)，所以不必太大，根据文档 1M 大小可保存 8000 文件的元信息，可以根据缓存文件数量进行设置。
+# 当levels=1:2时，表示是两级目录，1和2表示用1位和2位16进制来命名目录名称。
+# 当levels=2时，表示是一级目录，且目录数为16*16=256
+# 当levels=2:2:2时，表示是三级目录，且每级目录数均为16*16个
+proxy_cache_path /tmp/nginx_proxy_cache levels=1 keys_zone=cache_one:512m inactive=60s max_size=1000m;
+
+# server 区域下添加缓存配置
+location ~ \.(gif|jpg|png|htm|html|css|js)(.*) {
+    proxy_pass http://192.168.4.32:5000；#如果没有缓存则转向请求
+    proxy_redirect off;
+    proxy_cache cache_one;
+    proxy_cache_valid 200 1h;            #对不同的 HTTP 状态码设置不同的缓存时间
+    proxy_cache_valid 500 1d;
+    proxy_cache_valid any 1m;
+    expires 3d;
+}
+```
+
++ 搭建文件服务器
+
+```bash
+server {
+    server_name docker-file;
+    listen 9000;
+    root /etc/nginx/conf.d/; # 存放文件的目录
+    location / {
+        autoindex on; # 索引
+        autoindex_exact_size on; # 显示文件大小
+        autoindex_localtime on; # 显示文件时间
+    }
+    access_log  /var/log/nginx/docker.file.log;
+    error_log  /var/log/nginx/docker.file.error.log;
+}
+```
 
 ### nginx负载均衡的几种方法
 
