@@ -352,6 +352,7 @@ location块：配置请求路由，以及各种页面的处理情况。
 # 当levels=1:2时，表示是两级目录，1和2表示用1位和2位16进制来命名目录名称。
 # 当levels=2时，表示是一级目录，且目录数为16*16=256
 # 当levels=2:2:2时，表示是三级目录，且每级目录数均为16*16个
+
 proxy_cache_path /tmp/nginx_proxy_cache levels=1 keys_zone=cache_one:512m inactive=60s max_size=1000m;
 
 # server 区域下添加缓存配置
@@ -364,6 +365,15 @@ location ~ \.(gif|jpg|png|htm|html|css|js)(.*) {
     proxy_cache_valid any 1m;
     expires 3d;
 }
+
+# expires    24h;
+# expires    modified +24h;
+# expires    @24h;
+# expires    0;
+# expires    -1;
+# expires    epoch;
+# expires    $expires;
+# add_header Cache-Control private;
 ```
 
 + 搭建文件服务器
@@ -380,6 +390,44 @@ server {
     }
     access_log  /var/log/nginx/docker.file.log;
     error_log  /var/log/nginx/docker.file.error.log;
+}
+```
+
++ 配置跨域
+
+```
+location / {
+     if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        #
+        # Om nom nom cookies
+        #
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        #
+        # Custom headers and headers various browsers *should* be OK with but aren't
+        #
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+        #
+        # Tell client that this pre-flight info is valid for 20 days
+        #
+        add_header 'Access-Control-Max-Age' 1728000;
+        add_header 'Content-Type' 'text/plain charset=UTF-8';
+        add_header 'Content-Length' 0;
+        return 204;
+     }
+     if ($request_method = 'POST') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+     }
+     if ($request_method = 'GET') {
+        add_header 'Access-Control-Allow-Origin' '*';
+        add_header 'Access-Control-Allow-Credentials' 'true';
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+        add_header 'Access-Control-Allow-Headers' 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type';
+     }
 }
 ```
 
@@ -492,3 +540,4 @@ upstream node_cluster {
 + [nignx 负载均衡的几种算法介绍](https://www.cnblogs.com/lvgg/p/6140584.html)
 + [hash 算法原理及应用漫谈](https://www.cnblogs.com/sunsky303/p/11865321.html)
 + [Alphabetical index of variables](http://nginx.org/en/docs/varindex.html)
++ [Module ngx_http_headers_module](http://nginx.org/en/docs/http/ngx_http_headers_module.html#add_header)

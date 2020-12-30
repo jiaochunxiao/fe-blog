@@ -1,0 +1,22 @@
+[
+  {
+    "city": "烟台",
+    "province": "山东",
+    "name": "苹果"
+  },
+  {
+    "city": "武汉",
+    "province": "湖北",
+    "name": "鸭脖"
+  },
+  {
+    "city": "青岛",
+    "province": "山东",
+    "name": "啤酒"
+  },
+  {
+    "city": "柳州",
+    "province": "广西",
+    "name": "螺狮粉"
+  }
+]

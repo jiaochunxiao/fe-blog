@@ -12,6 +12,8 @@
     "chalk": "^4.1.0",
     "inquirer": "^7.3.3",
     "minimist": "^1.2.5",
-    "progress": "^2.0.3"
-  }
+    "progress": "^2.0.3",
+    "xlsx": "^0.16.9"
+  },
+  "dependencies": {}
 }

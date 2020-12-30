@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.16.8/xlsx.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.16.8/shim.min.js"></script> -->
+  <!-- <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.16.8/xlsx.js"></script> -->
+  <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>
+  <title>Document</title>
+  <style type="text/css">
+  .button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  .button {
+    width: 120px;
+    margin: 10px;
+    line-height: 34px;
+    border: 1px solid orange;
+    border-radius: 4px;
+    background: orange;
+    color: #fff;
+  }
+  </style>
+</head>
+<body>
+  <div class="button-container">
+    <button class="button" onclick="exportExcel('xls')">导出xls</button>
+    <button class="button" onclick="exportExcel('xlsx')">导出xlsx</button>
+    <button class="button" onclick="exportJson()">jsontoexcel</button>
+    <button class="button" onclick="exportExcel()">导出excel</button>
+  </div>
+
+  <script>
+    const aoa = [
+      ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
+      ['2020/10/07', '2020/11/07', '2020/11/08', '2020/11/10', '2020/11/20', '2020/11/25', '2020/11/30']
+    ];
+
+    const json = [
+      {
+        city: '烟台',
+        province: '山东',
+        name: '苹果',
+      },
+      {
+        city: '武汉',
+        province: '湖北',
+        name: '鸭脖',
+      },
+      {
+        city: '青岛',
+        province: '山东',
+        name: '啤酒',
+      },
+      {
+        city: '柳州',
+        province: '广西',
+        name: '螺狮粉',
+      },
+    ];
+    // aoa to sheet
+    const exportExcel = (type) => {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      // xlsx.min.js支持xls的导出，不支持xlsx导出
+      // 如需xlsx则需要引入xlsx.full.js
+      XLSX.writeFile(wb, `file.${type || 'xls'}`);
+    };
+
+    const exportJson = () => {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(json, {
+        header: ["name", "city", 'province']
+      })
+    }
+
+  </script>
+</body>
+</html>
