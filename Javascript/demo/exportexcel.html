@@ -32,8 +32,8 @@
   <div class="button-container">
     <button class="button" onclick="exportExcel('xls')">导出xls</button>
     <button class="button" onclick="exportExcel('xlsx')">导出xlsx</button>
-    <button class="button" onclick="exportJson()">jsontoexcel</button>
-    <button class="button" onclick="exportExcel()">导出excel</button>
+    <button class="button" onclick="exportJson('xls')">json_to_xls</button>
+    <button class="button" onclick="exportJson('xlsx')">json_to_xlsx</button>
   </div>
 
   <script>
@@ -66,7 +66,7 @@
       },
     ];
     // aoa to sheet
-    const exportExcel = (type) => {
+    const exportExcel = type => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(aoa);
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
@@ -75,11 +75,13 @@
       XLSX.writeFile(wb, `file.${type || 'xls'}`);
     };
 
-    const exportJson = () => {
+    const exportJson = type => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(json, {
         header: ["name", "city", 'province']
-      })
+      });
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, `file.${type || 'xls'}`);
     }
 
   </script>
