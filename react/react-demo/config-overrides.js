@@ -5,7 +5,8 @@ const {
     addBundleVisualizer,
     overrideDevServer,
     addWebpackPlugin,
-    setWebpackPublicPath
+    setWebpackPublicPath,
+    addLessLoader,
 } = require('customize-cra');
 const path = require('path');
 const webpack = require('webpack');
@@ -60,6 +61,21 @@ module.exports = {
         }),
         addWebpackAlias({
             ['@']: resolve('src')
+        }),
+        addLessLoader({
+            lessOptions: {
+                javascriptEnabled: true,
+                strictMath: true,
+                noIeCompat: true,
+                cssLoaderOptions: {
+                    test: /\.less$/,
+                    exclude: /\.module\.less$/,
+                }, // .less file used css-loader option, not all CSS file.
+                cssModules: {
+                  localIdentName: "[path][name]__[local]__[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
+                },
+                localIdentName: "[path][name]__[local]__[hash:base64:5]",
+            },
         }),
         process.env.NODE_ENV === 'development' ? addWebpackPlugin(new webpack.DefinePlugin({
             LOCALIP: JSON.stringify(localIP),
