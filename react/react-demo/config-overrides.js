@@ -72,9 +72,8 @@ module.exports = {
                     exclude: /\.module\.less$/,
                 }, // .less file used css-loader option, not all CSS file.
                 cssModules: {
-                  localIdentName: "[path][name]__[local]__[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
+                    localIdentName: "[path][name]__[local]__[hash:base64:5]", // if you use CSS Modules, and custom `localIdentName`, default is '[local]--[hash:base64:5]'.
                 },
-                localIdentName: "[path][name]__[local]__[hash:base64:5]",
             },
         }),
         process.env.NODE_ENV === 'development' ? addWebpackPlugin(new webpack.DefinePlugin({
