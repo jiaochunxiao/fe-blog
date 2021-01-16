@@ -1,0 +1,26 @@
+
+.formItem {
+  height: 115px;
+  width: 100%;
+}
+
+.normalStyle {
+  box-sizing: border-box;
+  padding: 0 16px;
+  line-height: 38px;
+  font-size: 15px;
+  color: #2e2d2d;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  outline: none;
+}
+
+.errorStyle {
+  border: 1px solid #F74040;
+}
+
+.errorTips {
+  color: #F74040;
+  font-size: 14px;
+  line-height: 1.5715;
+}
