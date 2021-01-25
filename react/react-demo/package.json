@@ -12,7 +12,7 @@
     "less-loader": "^7.2.1",
     "node-sass": "4.14.1",
     "rc-field-form": "^1.17.4",
-    "rc-form": "^2.4.12",
+    "rc-form": "2.1.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-grid-layout": "^1.2.0",

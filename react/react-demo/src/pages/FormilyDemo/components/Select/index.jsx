@@ -4,7 +4,7 @@ import styles from './index.module.scss';
 
 const Select  = props => {
   const {getFieldProps, getFieldError} = props.form;
-  const {rules, name, validateTrigger, enums} = props;
+  const {rules, name, validateTrigger, options} = props;
   const errors = getFieldError(name);
   return (
     <div className={styles.formItem}>
@@ -16,7 +16,7 @@ const Select  = props => {
         className={`${styles.normalStyle} ${errors ? styles.errorStyle : ''}`}
       >
         {
-          enums.map(item => <option value={item} key={item}>{item}</option>)
+          options.map(item => <option value={item} key={item}>{item}</option>)
         }
       </select>
       { errors

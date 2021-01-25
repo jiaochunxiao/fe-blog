@@ -19,7 +19,7 @@ const AreaSelect = props => {
         data={data}
         value={value}
         cols={3}
-        onChange={onChange}
+        onChange={this.onChange}
         {...getFieldProps(name, {
           rules,
           validateTrigger,

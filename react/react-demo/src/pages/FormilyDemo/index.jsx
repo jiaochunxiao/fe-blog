@@ -39,7 +39,7 @@ const FormItems = [
     title: '年级',
     name: 'grade',
     component: 'select',
-    enums: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级']
+    options: ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级']
   },
   {
     key: 'address',
@@ -64,7 +64,7 @@ const NewForm = props => {
       return <Input {...items} form={form} />;
     },
     'select': items => {
-      items.options = items.enums.map(value => {
+      items.options = items.options.map(value => {
         return {'label': value, value}
       });
       return <AntdSelect {...items} form={form} />;
@@ -106,7 +106,6 @@ const NewForm = props => {
             return RenderFormItem(item, form);
           })
         }
-        {/* <Input form={form} /> */}
         <button>submit</button>
       </form>
       <button onClick={setInitial}>set</button>
