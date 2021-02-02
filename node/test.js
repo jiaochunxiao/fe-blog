@@ -215,3 +215,18 @@ p1.then(resolve => {
 // console.log(compareVersion2('1.1.0', '1.2.0'));
 // console.log(compareVersion2('1.2.1', '1.12.1'));
 // console.log(compareVersion2('1.1.12', '1.2'));
+
+
+const value = 1;
+function foo() {
+  console.log(value);
+}
+
+function baz() {
+  const value = 2;
+  foo();
+}
+
+foo();
+
+baz();
