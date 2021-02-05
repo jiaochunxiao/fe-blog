@@ -19,8 +19,8 @@ auth:
     file: /verdaccio/conf/htpasswd
     # Maximum amount of users allowed to register, defaults to "+inf".
     # You can set this to -1 to disable registration.
-    #max_users: 1000
-    max_users: -1
+    max_users: 1000
+    #  max_users: -1
 # 启用安全令牌， 下面是用的JWT（JSON Web Token)，需要将JWT模块添加到API部分。
 security:
   api:
