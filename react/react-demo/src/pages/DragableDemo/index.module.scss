@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.form_container {
+  width: 240px;
+  box-sizing: border-box;
+  border: 1px solid orange;
+}
+
+.drag_container {
+  flex: 1;
+  margin-left: 20px;
+  box-sizing: border-box;
+  border: 1px solid orange;
+  // background-color: orange;
+}
