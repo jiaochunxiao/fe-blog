@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    width: 400px;
+    height: 500px;
+    justify-content: center;
+    align-items: center;
+}
+
+.child {
+    width: 200px;
+    height: 200px;
+    background-color: #fc9153;
+}

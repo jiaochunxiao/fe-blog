@@ -12,6 +12,7 @@ const Box = memo(function Box({ name, type, isDropped }) {
   }), [name, type]);
   return (
     <div ref={drag} role="Box" className={styles.box}>
+      {console.log('box-rerender')}
       {isDropped ? <s>{name}</s> : name}
     </div>
   );

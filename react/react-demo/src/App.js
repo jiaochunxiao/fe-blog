@@ -10,6 +10,7 @@ import './App.css';
 const Home = loadable(() => import('@/pages/Home'));
 const DragableDemo = loadable(() => import('@/pages/DragableDemo'));
 const FormilyDemo = loadable(() => import('@/pages/FormilyDemo'));
+const EventDemo = loadable(() => import('@/pages/EventDemo'));
 
 const routes = [
   {
@@ -29,6 +30,12 @@ const routes = [
     exact: true,
     title: '表单',
     component: FormilyDemo,
+  },
+  {
+    path: '/eventdemo',
+    exact: true,
+    title: 'React事件',
+    component: EventDemo,
   },
 ];
 
