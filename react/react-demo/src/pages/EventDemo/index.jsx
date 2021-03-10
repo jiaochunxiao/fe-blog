@@ -10,14 +10,14 @@ const EventDemo = () => {
         });
     }, []);
 
-    const handleOutClick = () => {
+    const handleOutClick = event => {
         console.log('outer');
+        event.stopPropagation();
     };
 
     const handleInnerClick = event => {
         console.log('inner');
         event.stopPropagation();
-        console.log(event);
     }
     return (
         <div className={styles.container} onClick={handleOutClick}>
