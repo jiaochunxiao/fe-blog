@@ -64,10 +64,18 @@ const NewForm = props => {
       return <Input {...items} form={form} />;
     },
     'select': items => {
-      items.options = items.options.map(value => {
-        return {'label': value, value}
+      const newItems = JSON.parse(JSON.stringify(items));
+      const options = []
+      newItems.options.map(value => {
+        console.log(value);
+        options.push({
+          label: value,
+          value: value,
+        });
+        return value;
       });
-      return <AntdSelect {...items} form={form} />;
+      newItems.options = options;
+      return <AntdSelect {...newItems} form={form} />;
     },
     'area-select': items => {
       return <AreaSelect {...items} form={form} />;
@@ -93,6 +101,7 @@ const NewForm = props => {
   const setInitial = () => {
     props.form.setFieldsValue({
       'grade': ['五年级'],
+      'student_name': '哈哈哈哈'
     }, () => {
       console.log('after');
     })

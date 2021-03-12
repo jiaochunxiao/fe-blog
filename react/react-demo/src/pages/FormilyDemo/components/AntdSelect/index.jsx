@@ -13,6 +13,7 @@ const AntdSelect = props => {
     console.log(e);
     setValue(e[0]);
   }
+  console.log(options);
   return (
     <>
       <Picker
