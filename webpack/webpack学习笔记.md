@@ -418,12 +418,105 @@ this.hooks.optimizeTree.callAsync(this.chunks, this.modules, err => {
 
 #### 找到示例
 
+Webpack 的钩子复杂程度不一，我认为最好的学习方法还是带着目的去查询其他插件中如何使用这些钩子。例如，在 compilation.seal 函数内部有 optimizeModules 和 afterOptimizeModules 这一对看起来很对偶的钩子，optimizeModules 从字面上可以理解为用于优化已经编译出的 modules ，那 afterOptimizeModules 呢？
+
+从 webpack 源码中唯一搜索到的用途是 ProgressPlugin ，大体上逻辑如下：
+
+```javascript
+
+compilation.hooks.afterOptimizeModules.intercept({
+  name: "ProgressPlugin",
+  call() {
+    handler(percentage, "sealing", title);
+  },
+  done() {
+    progressReporters.set(compiler, undefined);
+    handler(percentage, "sealing", title);
+  },
+  result() {
+    handler(percentage, "sealing", title);
+  },
+  error() {
+    handler(percentage, "sealing", title);
+  },
+  tap(tap) {
+    // p is percentage from 0 to 1
+    // args is any number of messages in a hierarchical matter
+    progressReporters.set(compilation.compiler, (p, ...args) => {
+      handler(percentage, "sealing", title, tap.name, ...args);
+    });
+    handler(percentage, "sealing", title, tap.name);
+  }
+});
+```
+
+基本上可以猜测出，afterOptimizeModules 的设计初衷就是用于通知优化行为的结束。
+
+apply 虽然是一个函数，但是从设计上就只有输入，webpack 不 care 输出，所以在插件中只能通过调用类型实体的各种方法来或者更改实体的配置信息，变更编译行为。例如：
+
++ compilation.addModule ：添加模块，可以在原有的 module 构建规则之外，添加自定义模块
++ compilation.emitAsset：直译是“提交资产”，功能可以理解将内容写入到特定路径
 
 
+### How: 如何影响编译状态
+
+webpack 的插件体系与平常所见的 订阅/发布 模式差别很大，是一种非常强耦合的设计，hooks 回调由 webpack 决定何时，以何种方式执行；而在 hooks 回调内部可以通过修改状态、调用上下文 api 等方式对 webpack 产生 side effect。
+
+EntryPlugin插件：
+
+```javascript
+class EntryPlugin {
+  apply(compiler) {
+    compiler.hooks.compilation.tap(
+      "EntryPlugin",
+      (compilation, { normalModuleFactory }) => {
+        compilation.dependencyFactories.set(
+          EntryDependency,
+          normalModuleFactory
+        );
+      }
+    );
+
+    compiler.hooks.make.tapAsync("EntryPlugin", (compilation, callback) => {
+      const { entry, options, context } = this;
+
+      const dep = EntryPlugin.createDependency(entry, options);
+      compilation.addEntry(context, dep, options, (err) => {
+        callback(err);
+      });
+    });
+  }
+}
+```
+
+上述代码片段调用了两个影响 compilation 对象状态的接口：
+
++ compilation.dependencyFactories.set
++ compilation.addEntry
+
+操作的具体含义可以先忽略，这里要理解的重点是，webpack 会将上下文信息以参数或 this (compiler 对象) 形式传递给钩子回调，在回调中可以调用上下文对象的方法或者直接修改上下文对象属性的方式，对原定的流程产生 side effect。所以想纯熟地编写插件，除了要理解调用时机，还需要了解我们可以用哪一些api，例如：
+
++ compilation.addModule：添加模块，可以在原有的 module 构建规则之外，添加自定义模块
++ compilation.emitAsset：直译是“提交资产”，功能可以理解将内容写入到特定路径
++ compilation.addEntry：添加入口，功能上与直接定义 entry 配置相同
++ module.addError：添加编译错误信息
++ ...
+
+### Loader介绍
+
+Loader 的作用和实现比较简单，容易理解，所以简单介绍一下就行了。回顾 loader 在编译流程中的生效的位置：
+
+![loader](./image/loader.png)
+
+流程图中， runLoaders 会调用用户所配置的 loader 集合读取、转译资源，此前的内容可以千奇百怪，但转译之后理论上应该输出标准 JavaScript 文本或者 AST 对象，webpack 才能继续处理模块依赖。
+
+理解了这个基本逻辑之后，loader 的职责就比较清晰了，不外乎是将内容 A 转化为内容 B，但是在具体用法层面还挺多讲究的，有 pitch、pre、post、inline 等概念用于应对各种场景。
+
+### Module与Module子类
+
+module 是 webpack 资源处理的基本单位，可以认为 webpack 对资源的路径解析、读入、转译、分析、打包输出，所有操作都是围绕着 module 展开的。有很多文章会说 module = 文件， 其实这种说法并不准确，比如子类 AsyncModuleRuntimeModule 就只是一段内置的代码，是一种资源而不能简单等价于实际文件。
+
+Webpack 扩展性很强，包括模块的处理逻辑上，比如说入口文件是一个普通的 js，此时首先创建 NormalModule 对象，在解析 AST 时发现这个文件里还包含了异步加载语句，例如 requere.ensure ，那么相应地会创建 AsyncModuleRuntimeModule 模块，注入异步加载的模板代码。上面类图的 54 个 module 子类都是为适配各种场景设计的。
 
 
-
-
-
-
-
+[一文吃透 Webpack 核心原理（万字总结，建议收藏)](https://mp.weixin.qq.com/s/KlxCK9KsY6KHw67YPD4Ftw)
