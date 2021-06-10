@@ -11,6 +11,7 @@ const Home = loadable(() => import('@/pages/Home'));
 const DragableDemo = loadable(() => import('@/pages/DragableDemo'));
 const FormilyDemo = loadable(() => import('@/pages/FormilyDemo'));
 const EventDemo = loadable(() => import('@/pages/EventDemo'));
+const ClassDemo = loadable(() => import('@/pages/ClassDemo'))
 
 const routes = [
   {
@@ -36,6 +37,12 @@ const routes = [
     exact: true,
     title: 'React事件',
     component: EventDemo,
+  },
+  {
+    path: '/classdemo',
+    exact: true,
+    title: 'classDEMO',
+    component: ClassDemo,
   },
 ];
 
