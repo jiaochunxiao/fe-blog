@@ -14,6 +14,7 @@ import Counter from './Counter';
 
 describe('测试Counter方法', () => {
     let counter = null;
+    console.log('describe 1');
     beforeAll(() => {
         console.log('beforeAll');
         counter = new Counter();
@@ -34,6 +35,7 @@ describe('测试Counter方法', () => {
     })
 
     describe('测试Counter中的加法', () => {
+        console.log('describe 2');
         test('测试 Couter中的 addOne', () => {
             console.log('测试 Couter中的 addOne');
             counter.addOne();
@@ -49,6 +51,7 @@ describe('测试Counter方法', () => {
 
 
     describe('测试Counter中的减法', () => {
+        console.log('describe 2');
         test('测试 Couter中的 minusOne', () => {
             console.log('测试 Couter中的 minusOne');
             counter.minusOne();

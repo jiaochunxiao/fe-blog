@@ -1,5 +1,11 @@
 ## Jest
 
+### jest.config.json
+
+```bash
+jest --init
+```
+
 ### Jest 指标
 + smts
 
@@ -18,6 +24,44 @@
 + .toBeGreaterThan(number | bigInt)
 + .not
 + ...
+
+### 钩子函数
+
+#### beforeAll()
+
+
+#### afterAll()
+
+#### beforeEach()
+
+#### afterEach()
+
+
+### mock
+
+#### 自动mock
+
+jest.config.json
+
+```json
+automock: true
+
+```
+
+设置后自动寻找根目录下的__mocks__内的文件。
+
+
+#### 手动配置
+
+```javascript
+jest.mock('./demo);
+```
+
+#### 异步走__mocks__，同步走真是文件
+
+```javascript
+const {getNumber} = jest.requreActual('./demo');
+```
 
 
 **参考**
