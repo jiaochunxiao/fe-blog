@@ -63,6 +63,18 @@ jest.mock('./demo);
 const {getNumber} = jest.requreActual('./demo');
 ```
 
+### TDD （Test Driven Development)
+
+（Red-Green Development)
+
++ 编写测试用例
++ 运行测试用例，测试用例无法通过测试
++ 编写代码，使测试用例通过测试
++ 优化代码，完成开发
++ 重复上述步骤
+
+
+
 
 **参考**
 + [Testing React Components with react-test-renderer, and the Act API](https://www.valentinog.com/blog/testing-react/)
