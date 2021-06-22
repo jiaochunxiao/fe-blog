@@ -73,7 +73,16 @@ const {getNumber} = jest.requreActual('./demo');
 + 优化代码，完成开发
 + 重复上述步骤
 
+### Enzyme
 
+#### jest-enzyme
+
+```json
+"setupFilesAfterEnv": [
+  "<rootDir>/src/setupTests.js",
+  "./node_modules/jest-enzyme/lib/index.js"
+],
+```
 
 
 **参考**
