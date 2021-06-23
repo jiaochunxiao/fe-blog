@@ -7,10 +7,12 @@ module.exports = {
         "!src/**/*.d.ts"
     ],
     "setupFiles": [
-        "react-app-polyfill/jsdom"
+        "react-app-polyfill/jsdom",
     ],
     "setupFilesAfterEnv": [
-        "<rootDir>/src/setupTests.js"
+        "<rootDir>/src/setupTests.js",
+        "<rootDir>/src/utils/testSetup.js",
+        "./node_modules/jest-enzyme/lib/index.js"
     ],
     "testMatch": [
         "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
