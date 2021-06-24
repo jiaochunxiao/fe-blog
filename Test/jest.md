@@ -84,6 +84,24 @@ const {getNumber} = jest.requreActual('./demo');
 ],
 ```
 
+### TDD VS BDD
+
+TDD：
+
++ 先写测试再写代码
++ 一般结合单元测试使用，是白盒测试
++ 测试重点在代码
++ 安全感低
++ 速度快
+
+BDD：
++ 先写代码再写测试
++ 一般结合集成测试使用，是黑盒测试
++ 测试重点在UI(DOM)
++ 安全性高
++ 速度慢
+
+
 
 **参考**
 + [Testing React Components with react-test-renderer, and the Act API](https://www.valentinog.com/blog/testing-react/)
