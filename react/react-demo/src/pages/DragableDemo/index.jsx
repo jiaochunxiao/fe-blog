@@ -9,6 +9,7 @@ import Box from './components/Box/index';
 import Container from './components/Container/index';
 
 import styles from './index.module.scss';
+console.log(styles);
 
 const ACCECPTS = Object.keys(ItemTypes).map(key => ItemTypes[key]);
 console.log(ACCECPTS);

@@ -6,7 +6,7 @@
 
 child_process 模块提供了四个创建子进程的方法：
 
-+ child_process.spawn(command, args)
++ child_process.spawn(command, args) spawn()执行耗时任务。
 + child_process.exec(command, options)
 + child_process.execFile(file, args[,callback])
 + child_process.fork(modulePath, args)
