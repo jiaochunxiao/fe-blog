@@ -375,7 +375,124 @@ class App extends React.Component {
 }
 ```
 
+### 错误边界（Error Boundaries）
 
+错误边界是一种 React 组件，这种组件可以捕获发生在其子组件树任何位置的 JavaScript 错误，并打印这些错误，同时展示降级 UI，而并不会渲染那些发生崩溃的子组件树。错误边界在渲染期间、生命周期方法和整个组件树的构造函数中捕获错误。
+
+*注意*
+错误边界无法捕获以下场景中产生的错误：
++ 事件处理
++ 异步代码（例如 setTimeout 或 requestAnimationFrame 回调函数）
++ 服务端渲染
++ 它自身抛出来的错误（并非它的子组件)
+
+如果一个 class 组件中定义了 static getDerivedStateFromError() 或 componentDidCatch() 这两个生命周期方法中的任意一个（或两个）时，那么它就变成一个错误边界。当抛出错误后，请使用 static getDerivedStateFromError() 渲染备用 UI ，使用 componentDidCatch() 打印错误信息。
+
+```javascript
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // 更新 state 使下一次渲染能够显示降级后的 UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // 你同样可以将错误日志上报给服务器
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // 你可以自定义降级后的 UI 并渲染
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+可以将它作为一个常规组件去使用：
+
+```javascript
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
+```
+
+错误边界的工作方式类似于 JavaScript 的 catch {}，不同的地方在于错误边界只针对 React 组件。**只有 class 组件才可以成为错误边界组件**。大多数情况下, 你只需要声明一次错误边界组件, 并在整个应用中使用它。
+
+注意错误边界仅可以捕获其子组件的错误，它无法捕获其自身的错误。如果一个错误边界无法渲染错误信息，则错误会冒泡至最近的上层错误边界，这也类似于 JavaScript 中 catch {} 的工作机制。
+
+#### 未捕获错误（Uncaught Errors）的新行为
+
+这一改变具有重要意义，自 React 16 起，任何未被错误边界捕获的错误将会导致整个 React 组件树被卸载。
+
+
+**错误边界无法捕获事件处理器内部的错误。**
+
+### Refs 转发
+
+Ref 转发是一个可选特性，其允许某些组件接收 ref，并将其向下传递（换句话说，“转发”它）给子组件。
+
+```javascript
+const FancyButton = React.forwardRef((props, ref) => (
+  <button ref={ref} className="FancyButton">
+    {props.children}
+  </button>
+));
+
+// 你可以直接获取 DOM button 的 ref：
+const ref = React.createRef();
+<FancyButton ref={ref}>Click me!</FancyButton>;
+```
+
+这样，使用 FancyButton 的组件可以获取底层 DOM 节点 button 的 ref ，并在必要时访问，就像其直接使用 DOM button 一样。
+
+以下是对上述示例发生情况的逐步解释：
+
++ 我们通过调用 React.createRef 创建了一个 React ref 并将其赋值给 ref 变量。
++ 我们通过指定 ref 为 JSX 属性，将其向下传递给 <FancyButton ref={ref}>。
++ React 传递 ref 给 forwardRef 内函数 (props, ref) => ...，作为其第二个参数。
++ 我们向下转发该 ref 参数到 <button ref={ref}>，将其指定为 JSX 属性。
++ 当 ref 挂载完成，ref.current 将指向 <button> DOM 节点。
+
+**注意**
+
+> 第二个参数 ref 只在使用 React.forwardRef 定义组件时存在。常规函数和 class 组件不接收 ref 参数，且 props 中也不存在 ref。
+>
+> Ref 转发不仅限于 DOM 组件，你也可以转发 refs 到 class 组件实例中
+
+高阶组件中转发 refs
+
+```javascript
+function logProps(Component) {
+  class LogProps extends React.Component {
+    componentDidUpdate(prevProps) {
+      console.log('old props:', prevProps);
+      console.log('new props:', this.props);
+    }
+
+    render() {
+      const {forwardedRef, ...rest} = this.props;
+
+      // 将自定义的 prop 属性 “forwardedRef” 定义为 ref
+      return <Component ref={forwardedRef} {...rest} />;
+    }
+  }
+
+  // 注意 React.forwardRef 回调的第二个参数 “ref”。
+  // 我们可以将其作为常规 prop 属性传递给 LogProps，例如 “forwardedRef”
+  // 然后它就可以被挂载到被 LogProps 包裹的子组件上。
+  return React.forwardRef((props, ref) => {
+    return <LogProps {...props} forwardedRef={ref} />;
+  });
+}
+```
 
 *参考：*
 + [你真的理解setState吗？](https://juejin.cn/post/6844903636749778958)
