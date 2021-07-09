@@ -494,6 +494,381 @@ function logProps(Component) {
 }
 ```
 
+### Fragments
+
+React 中的一个常见模式是一个组件返回多个元素。Fragments 允许你将子列表分组，而无需向 DOM 添加额外节点。
+
+```javascript
+render() {
+  return (
+    <React.Fragment>
+      <ChildA />
+      <ChildB />
+      <ChildC />
+    </React.Fragment>
+  );
+}
+
+class Columns extends React.Component {
+  render() {
+    return (
+      <>
+        <td>Hello</td>
+        <td>World</td>
+      </>
+    );
+  }
+}
+```
+
+#### 带 key 的 Fragments
+
+使用显式 <React.Fragment> 语法声明的片段可能具有 key。一个使用场景是将一个集合映射到一个 Fragments 数组 - 举个例子，创建一个描述列表：
+
+```javascript
+function Glossary(props) {
+  return (
+    <dl>
+      {props.items.map(item => (
+        // 没有`key`，React 会发出一个关键警告
+        <React.Fragment key={item.id}>
+          <dt>{item.term}</dt>
+          <dd>{item.description}</dd>
+        </React.Fragment>
+      ))}
+    </dl>
+  );
+}
+```
+key 是唯一可以传递给 Fragment 的属性。未来我们可能会添加对其他属性的支持，例如事件。
+
+### 高阶组件
+
+> 高阶组件（HOC）是 React 中用于复用组件逻辑的一种高级技巧。HOC 自身不是 React API 的一部分，它是一种基于 React 的组合特性而形成的设计模式。
+
+具体而言，高阶组件是参数为组件，返回值为新组件的函数。
+
+```javascript
+const EnhancedComponent = higherOrderComponent(WrappedComponent);
+```
+
+组件是将 props 转换为 UI，而高阶组件是将组件转换为另一个组件。
+
+
+#### 不要在 render 方法中使用 HOC
+
+React 的 diff 算法（称为协调）使用组件标识来确定它是应该更新现有子树还是将其丢弃并挂载新子树。 如果从 render 返回的组件与前一个渲染中的组件相同（===），则 React 通过将子树与新子树进行区分来递归更新子树。 如果它们不相等，则完全卸载前一个子树。
+
+通常，你不需要考虑这点。但对 HOC 来说这一点很重要，因为这代表着你不应在组件的 render 方法中对一个组件应用 HOC：
+
+```javascript
+render() {
+  // 每次调用 render 函数都会创建一个新的 EnhancedComponent
+  // EnhancedComponent1 !== EnhancedComponent2
+  const EnhancedComponent = enhance(MyComponent);
+  // 这将导致子树每次渲染都会进行卸载，和重新挂载的操作！
+  return <EnhancedComponent />;
+}
+```
+
+这不仅仅是性能问题 - 重新挂载组件会导致该组件及其所有子组件的状态丢失。
+
+如果在组件之外创建 HOC，这样一来组件只会创建一次。因此，每次 render 时都会是同一个组件。一般来说，这跟你的预期表现是一致的。
+
+在极少数情况下，你需要动态调用 HOC。你可以在组件的生命周期方法或其构造函数中进行调用。
+
+#### 务必复制静态方法
+
+有时在 React 组件上定义静态方法很有用。例如，Relay 容器暴露了一个静态方法 getFragment 以方便组合 GraphQL 片段。
+
+但是，当你将 HOC 应用于组件时，原始组件将使用容器组件进行包装。这意味着新组件没有原始组件的任何静态方法。
+
+```javascript
+// 定义静态函数
+WrappedComponent.staticMethod = function() {/*...*/}
+// 现在使用 HOC
+const EnhancedComponent = enhance(WrappedComponent);
+
+// 增强组件没有 staticMethod
+typeof EnhancedComponent.staticMethod === 'undefined' // true
+```
+为了解决这个问题，你可以在返回之前把这些方法拷贝到容器组件上：
+
+```javascript
+function enhance(WrappedComponent) {
+  class Enhance extends React.Component {/*...*/}
+  // 必须准确知道应该拷贝哪些方法 :(
+  Enhance.staticMethod = WrappedComponent.staticMethod;
+  return Enhance;
+}
+```
+
+但要这样做，你需要知道哪些方法应该被拷贝。你可以使用 hoist-non-react-statics 自动拷贝所有非 React 静态方法:
+
+```javascript
+import hoistNonReactStatic from 'hoist-non-react-statics';
+function enhance(WrappedComponent) {
+  class Enhance extends React.Component {/*...*/}
+  hoistNonReactStatic(Enhance, WrappedComponent);
+  return Enhance;
+}
+```
+除了导出组件，另一个可行的方案是再额外导出这个静态方法。
+
+```javascript
+// 使用这种方式代替...
+MyComponent.someFunction = someFunction;
+export default MyComponent;
+
+// ...单独导出该方法...
+export { someFunction };
+
+// ...并在要使用的组件中，import 它们
+import MyComponent, { someFunction } from './MyComponent.js';
+
+```
+
+#### Refs 不会被传递
+
+虽然高阶组件的约定是将所有 props 传递给被包装组件，但这对于 refs 并不适用。那是因为 ref 实际上并不是一个 prop - 就像 key 一样，它是由 React 专门处理的。如果将 ref 添加到 HOC 的返回组件中，则 ref 引用指向容器组件，而不是被包装组件。
+
+这个问题的解决方案是通过使用 React.forwardRef API（React 16.3 中引入）。
+
+### 深入JSX
+
+实际上，JSX 仅仅只是 React.createElement(component, props, ...children) 函数的语法糖。
+
+```javascript
+<MyButton color="blue" shadowSize={2}>
+  Click Me
+</MyButton>
+```
+
+会被编译成：
+
+```javascript
+React.createElement(
+  MyButton,
+  {color: 'blue', shadowSize: 2},
+  'Click Me'
+)
+```
+
+```javascript
+<div className="sidebar" />
+```
+编译成：
+```javascript
+React.createElement(
+  'div',
+  {className: 'sidebar'}
+)
+```
+
+#### React 必须在作用域内
+
+#### 用户定义的组件必须以大写字母开头
+
+#### 在运行时选择类型
+
+```javascript
+import React from 'react';
+import { PhotoStory, VideoStory } from './stories';
+
+const components = {
+  photo: PhotoStory,
+  video: VideoStory
+};
+
+function Story(props) {
+  // 错误！JSX 类型不能是一个表达式。
+  return <components[props.storyType] story={props.story} />;
+}
+
+function Story(props) {
+  // 正确！JSX 类型可以是大写字母开头的变量。
+  const SpecificStory = components[props.storyType];
+  return <SpecificStory story={props.story} />;
+}
+```
+
+#### JSX 中的子元素
+
+
+包含在开始和结束标签之间的 JSX 表达式内容将作为特定属性 props.children 传递给外层组件。有几种不同的方法来传递子元素：
+
+##### 字符串字面量
+
+你可以将字符串放在开始和结束标签之间，此时 props.children 就只是该字符串。这对于很多内置的 HTML 元素很有用。例如：
+
+```javascript
+<MyComponent>Hello world!</MyComponent>
+```
+
+##### JSX 子元素
+
+子元素允许由多个 JSX 元素组成。这对于嵌套组件非常有用：
+
+```javascript
+<MyContainer>
+  <MyFirstComponent />
+  <MySecondComponent />
+</MyContainer>
+```
+
+##### JavaScript 表达式作为子元素
+
+```javascript
+// 两者等价
+<MyComponent>foo</MyComponent>
+
+<MyComponent>{'foo'}</MyComponent>
+
+```
+
+##### 函数作为子元素
+
+通常，JSX 中的 JavaScript 表达式将会被计算为字符串、React 元素或者是列表。不过，props.children 和其他 prop 一样，它可以传递任意类型的数据，而不仅仅是 React 已知的可渲染类型。例如，如果你有一个自定义组件，你可以把回调函数作为 props.children 进行传递：
+
+```javascript
+// 调用子元素回调 numTimes 次，来重复生成组件
+function Repeat(props) {
+  let items = [];
+  for (let i = 0; i < props.numTimes; i++) {
+    items.push(props.children(i));
+  }
+  return <div>{items}</div>;
+}
+
+function ListOfTenThings() {
+  return (
+    <Repeat numTimes={10}>
+      {(index) => <div key={index}>This is item {index} in the list</div>}
+    </Repeat>
+  );
+}
+```
+
+##### 布尔类型、Null 以及 Undefined 将会忽略
+
+false, null, undefined, and true 是合法的子元素。但它们并不会被渲染。以下的 JSX 表达式渲染结果相同：
+
+```javascript
+<div />
+
+<div></div>
+
+<div>{false}</div>
+
+<div>{null}</div>
+
+<div>{undefined}</div>
+
+<div>{true}</div>
+```
+
+
+### Portals
+
+Portal 提供了一种将子节点渲染到存在于父组件以外的 DOM 节点的优秀的方案。
+
+```javascript
+ReactDOM.createPortal(child, container)
+```
+
+第一个参数（child）是任何可渲染的 React 子元素，例如一个元素，字符串或 fragment。第二个参数（container）是一个 DOM 元素。
+
+#### 通过 Portal 进行事件冒泡
+
+尽管 portal 可以被放置在 DOM 树中的任何地方，但在任何其他方面，其行为和普通的 React 子节点行为一致。由于 portal 仍存在于 React 树， 且与 DOM 树 中的位置无关，那么无论其子节点是否是 portal，像 context 这样的功能特性都是不变的。
+
+这包含事件冒泡。一个从 portal 内部触发的事件会一直冒泡至包含 React 树的祖先，即便这些元素并不是 DOM 树 中的祖先。假设存在如下 HTML 结构：
+
+```javascript
+// 在 DOM 中有两个容器是兄弟级 （siblings）
+const appRoot = document.getElementById('app-root');
+const modalRoot = document.getElementById('modal-root');
+
+class Modal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.el = document.createElement('div');
+  }
+
+  componentDidMount() {
+    // 在 Modal 的所有子元素被挂载后，
+    // 这个 portal 元素会被嵌入到 DOM 树中，
+    // 这意味着子元素将被挂载到一个分离的 DOM 节点中。
+    // 如果要求子组件在挂载时可以立刻接入 DOM 树，
+    // 例如衡量一个 DOM 节点，
+    // 或者在后代节点中使用 ‘autoFocus’，
+    // 则需添加 state 到 Modal 中，
+    // 仅当 Modal 被插入 DOM 树中才能渲染子元素。
+    modalRoot.appendChild(this.el);
+  }
+
+  componentWillUnmount() {
+    modalRoot.removeChild(this.el);
+  }
+
+  render() {
+    return ReactDOM.createPortal(
+      this.props.children,
+      this.el
+    );
+  }
+}
+
+class Parent extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {clicks: 0};
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    // 当子元素里的按钮被点击时，
+    // 这个将会被触发更新父元素的 state，
+    // 即使这个按钮在 DOM 中不是直接关联的后代
+    this.setState(state => ({
+      clicks: state.clicks + 1
+    }));
+  }
+
+  render() {
+    return (
+      <div onClick={this.handleClick}>
+        <p>Number of clicks: {this.state.clicks}</p>
+        <p>
+          Open up the browser DevTools
+          to observe that the button
+          is not a child of the div
+          with the onClick handler.
+        </p>
+        <Modal>
+          <Child />
+        </Modal>
+      </div>
+    );
+  }
+}
+
+function Child() {
+  // 这个按钮的点击事件会冒泡到父元素
+  // 因为这里没有定义 'onClick' 属性
+  return (
+    <div className="modal">
+      <button>Click</button>
+    </div>
+  );
+}
+
+ReactDOM.render(<Parent />, appRoot);
+
+```
+在父组件里捕获一个来自 portal 冒泡上来的事件，使之能够在开发时具有不完全依赖于 portal 的更为灵活的抽象。例如，如果你在渲染一个 <Modal /> 组件，无论其是否采用 portal 实现，父组件都能够捕获其事件。
+
+
 *参考：*
 + [你真的理解setState吗？](https://juejin.cn/post/6844903636749778958)
 
