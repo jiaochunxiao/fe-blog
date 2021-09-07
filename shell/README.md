@@ -175,3 +175,6 @@ echo ${#string}
 string="Hello World"
 echo ${string:1:4} #输出 ello
 ```
+
+#### sed
+
