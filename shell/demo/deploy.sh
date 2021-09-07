@@ -8,7 +8,7 @@ rnBranch='master'
 appBranch='dev'
 
 cloneReactNative() {
-  git clone -b $rnBranch  http://git.baijia.com/weishi-fe/weishi-app-rn.git
+  git clone -b $rnBranch  http://git.test.com/weishi-fe/weishi-app-rn.git
   cd weishi-app-rn/
   npm i
   npm run build-android
@@ -17,7 +17,7 @@ cloneReactNative() {
 }
 
 cloneNative() {
-  git clone -b $appBranch http://git.baijia.com/weishi/weishi-app-android.git
+  git clone -b $appBranch http://git.test.com/weishi/weishi-app-android.git
 }
 
 copyFiles() {
