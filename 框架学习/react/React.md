@@ -954,7 +954,8 @@ function onRenderCallback(
 当对比两棵树时，React 首先比较两棵树的根节点。不同类型的根节点元素会有不同的形态。
 ##### 对比不同类型的元素
 
-当根节点为不同类型的元素时，React 会拆卸原有的树并且建立起新的树。举个例子，当一个元素从 <a> 变成 <img>，从 <Article> 变成 <Comment>，或从 <Button> 变成 <div> 都会触发一个完整的重建流程。
+当根节点为不同类型的元素时，React 会拆卸原有的树并且建立起新的树。举个例子，当一个元素从 \<a> 变成 \<img>，从  \<Article> 变成 \
+<Comment>，或从 \<Button> 变成 \<div> 都会触发一个完整的重建流程。
 
 当卸载一棵树时，对应的 DOM 节点也会被销毁。组件实例将执行 componentWillUnmount() 方法。当建立一棵新的树时，对应的 DOM 节点会被创建以及插入到 DOM 中。组件实例将执行 UNSAFE_componentWillMount() 方法，紧接着 componentDidMount() 方法。所有与之前的树相关联的 state 也会被销毁。
 
@@ -1156,7 +1157,7 @@ class CustomTextInput extends React.Component {
 
 ##### Refs 与函数组件
 
-默认情况下，你不能在函数组件上使用 ref 属性，因为它们没有实例：
+**默认情况下，你不能在函数组件上使用 ref 属性，因为它们没有实例**：
 
 ```javascript
 function MyFunctionComponent() {
@@ -1177,7 +1178,7 @@ class Parent extends React.Component {
 }
 ```
 
-如果要在函数组件中使用 ref，你可以使用 forwardRef（可与 useImperativeHandle 结合使用），或者可以将该组件转化为 class 组件。
+**如果要在函数组件中使用 ref，你可以使用 forwardRef（可与 useImperativeHandle 结合使用），或者可以将该组件转化为 class 组件**。
 
 
 不管怎样，你可以在函数组件内部使用 ref 属性，只要它指向一个 DOM 元素或 class 组件：
@@ -1302,6 +1303,39 @@ class MouseTracker extends React.Component {
   )}
 </Mouse>
 ```
+
+### 严格模式
+
+> StrictMode 是一个用来突出显示应用程序中潜在问题的工具。与 Fragment 一样，StrictMode 不会渲染任何可见的 UI。它为其后代元素触发额外的检查和警告。
+
+```javascript
+import React from 'react';
+
+function ExampleApplication() {
+  return (
+    <div>
+      <Header />
+      <React.StrictMode>
+        <div>
+          <ComponentOne />
+          <ComponentTwo />
+        </div>
+      </React.StrictMode>
+      <Footer />
+    </div>
+  );
+}
+```
+
+在上述的示例中，不会对 Header 和 Footer 组件运行严格模式检查。但是，ComponentOne 和 ComponentTwo 以及它们的所有后代元素都将进行检查。
+
+StrictMode 目前有助于：
++ 识别不安全的生命周期
++ 关于使用过时字符串 ref API 的警告
++ 关于使用废弃的 findDOMNode 方法的警告
++ 检测意外的副作用
++ 检测过时的 context API
+
 
 
 

@@ -42,38 +42,53 @@
 # read  word
 # echo "hello $word,welcome to my program"
 
-echo "\$*"= $*
-echo "\"\$*\"=" "$*"
+# echo "\$*"= $*
+# echo "\"\$*\"=" "$*"
 
-echo "\$@"= $@
-echo "\"\$@\"=" "$@"
+# echo "\$@"= $@
+# echo "\"\$@\"=" "$@"
 
-echo "print each param from \$*"
+# echo "print each param from \$*"
 
-for var in $*
-do
-  echo "$var"
-done
+# for var in $*
+# do
+#   echo "$var"
+# done
 
-echo "print each param from \$@"
+# echo "print each param from \$@"
 
-for var in $@
-do
-  echo "$var"
-done
+# for var in $@
+# do
+#   echo "$var"
+# done
 
-echo "print each param from \"\$*\""
+# echo "print each param from \"\$*\""
 
-for var in "$*"
-do
-  echo "$var"
-done
+# for var in "$*"
+# do
+#   echo "$var"
+# done
 
-echo "print each param from \"\$@\""
+# echo "print each param from \"\$@\""
 
-for var in "$@"
-do
-  echo "$var"
-done
+# for var in "$@"
+# do
+#   echo "$var"
+# done
 
 
+# sed -i '' '1s/^/\/\/\ /' test.txt
+# sed -i '' '2s/\/\///' test.txt
+
+# 删除整行
+# sed -i '' '2d' test.txt
+
+# # sed -i '' -e '1i\\
+# # hahhah' test.txt
+
+# # 某行下插入整行
+# sed -i '' -e $"1 a\\
+# xxx" test.txt
+
+sed -i '' -e $'2 c\\
+xxxx' test.txt
