@@ -8,8 +8,3 @@ const mySetInterval = (callback, time) => {
   }
   inner();
 };
-
-
-mySetInterval(() => {
-  console.log(`-------now: ${new Date()}`);
-}, 1000);
