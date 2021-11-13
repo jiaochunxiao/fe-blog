@@ -8,3 +8,7 @@ const mySetInterval = (callback, time) => {
   }
   inner();
 };
+
+function sum(a, b) {
+
+}
