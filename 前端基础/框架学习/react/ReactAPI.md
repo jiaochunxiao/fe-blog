@@ -657,3 +657,318 @@ React 的开发和生产构建版本在 componentDidCatch() 的方式上有轻�
 相反，在生产模式下，错误不会冒泡，这意味着任何根错误处理器只会接受那些没有显式地被 componentDidCatch() 捕获的错误。
 
 > 如果发生错误，你可以通过调用 setState 使用 componentDidCatch() 渲染降级 UI，但在未来的版本中将不推荐这样做。 可以使用静态 getDerivedStateFromError() 来处理降级渲染。
+
+### 过时的生命周期方法
+
+#### UNSAFE_componentWillMount()
+
+UNSAFE_componentWillMount() 在挂载之前被调用。它在 render() 之前调用，因此在此方法中同步调用 setState() 不会触发额外渲染。通常，我们建议使用 constructor() 来初始化 state。
+
+避免在此方法中引入任何副作用或订阅。如遇此种情况，请改用 componentDidMount()。
+
+**此方法是服务端渲染唯一会调用的生命周期函数。**
+
+#### UNSAFE_componentWillReceiveProps()
+
+```jsx
+componentWillReceiveProps(nextProps)
+```
+
+
+> 使用此生命周期方法通常会出现 bug 和不一致性：
+>
+> + 如果你需要执行副作用（例如，数据提取或动画）以响应 props 中的更改，请改用 componentDidUpdate 生命周期。
+>
+> + 如果你使用 componentWillReceiveProps 仅在 prop 更改时重新计算某些数据，请使用 memoization helper 代替。
+>
+> + 如果你使用 componentWillReceiveProps 是为了在 prop 更改时“重置”某些 state，请考虑使组件完全受控或使用 key 使组件完全不受控 代替。
+
+UNSAFE_componentWillReceiveProps() 会在已挂载的组件接收新的 props 之前被调用。如果你需要更新状态以响应 prop 更改（例如，重置它），你可以比较 this.props 和 nextProps 并在此方法中使用 this.setState() 执行 state 转换。
+
+请注意，如果父组件导致组件重新渲染，即使 props 没有更改，也会调用此方法。如果只想处理更改，请确保进行当前值与变更值的比较。
+
+在挂载过程中，React 不会针对初始 props 调用 UNSAFE_componentWillReceiveProps()。组件只会在组件的 props 更新时调用此方法。调用 this.setState() 通常不会触发 UNSAFE_componentWillReceiveProps()。
+
+#### UNSAFE_componentWillUpdate()
+
+```jsx
+UNSAFE_componentWillUpdate(nextProps, nextState)
+```
+当组件收到新的 props 或 state 时，会在**渲染之前**调用 UNSAFE_componentWillUpdate()。使用此作为在更新发生之前执行准备更新的机会。初始渲染不会调用此方法。
+
+当组件收到新的 props 或 state 时，会在渲染之前调用 UNSAFE_componentWillUpdate()。使用此作为在更新发生之前执行准备更新的机会。初始渲染不会调用此方法。
+
+注意，你不能此方法中调用 this.setState()；在 UNSAFE_componentWillUpdate() 返回之前，你也不应该执行任何其他操作（例如，dispatch Redux 的 action）触发对 React 组件的更新
+
+通常，此方法可以替换为 componentDidUpdate()。如果你在此方法中读取 DOM 信息（例如，为了保存滚动位置），则可以将此逻辑移至 getSnapshotBeforeUpdate() 中。
+
+> 如果 shouldComponentUpdate() 返回 false，则不会调用 UNSAFE_componentWillUpdate()。
+
+### 其他API
+
+#### setState()
+
+```jsx
+setState(updater, [callback])
+```
+
+setState() 将对组件 state 的更改排入队列，并通知 React 需要使用更新后的 state 重新渲染此组件及其子组件。这是用于更新用户界面以响应事件处理器和处理服务器数据的主要方式。
+
+将 setState() 视为请求而不是立即更新组件的命令。为了更好的感知性能，React 会延迟调用它，然后通过一次传递更新多个组件。React 并不会保证 state 的变更会立即生效。
+
+setState() 并不总是立即更新组件。它会批量推迟更新。这使得在调用 setState() 后立即读取 this.state 成为了隐患。为了消除隐患，请使用 componentDidUpdate 或者 setState 的回调函数（setState(updater, callback)），这两种方式都可以保证在应用更新后触发。
+
+除非 shouldComponentUpdate() 返回 false，否则 setState() 将始终执行重新渲染操作。如果可变对象被使用，且无法在 shouldComponentUpdate() 中实现条件渲染，那么仅在新旧状态不一时调用 setState()可以避免不必要的重新渲染。
+
+参数一为带有形式参数的 updater 函数：
+```jsx
+(state, props) = stateChange
+```
+state 是对应用变化时组件状态的引用。当然，它不应直接被修改。你应该使用基于 state 和 props 构建的新对象来表示变化。例如，假设我们想根据 props.step 来增加 state：
+```jsx
+this.setState((state, props) => {
+  return {counter: state.counter + props.step};
+})
+```
+
+updater 函数中接收的 state 和 props 都保证为最新。updater 的返回值会与 state 进行浅合并。
+
+setState() 的第二个参数为可选的回调函数，它将在 setState 完成合并并重新渲染组件后执行。通常，我们建议使用 componentDidUpdate() 来代替此方式。
+
+setState() 的第一个参数除了接受函数外，还可以接受对象类型：
+```jsx
+setState(stateChange[, callback])
+```
+
+stateChange 会将传入的对象浅层合并到新的 state 中，例如，调整购物车商品数：
+```jsx
+this.setState({quantity: 2})
+```
+这种形式的 setState() 也是异步的，并且在同一周期内会对多个 setState 进行批处理。例如，如果在同一周期内多次设置商品数量增加，则相当于:
+```jsx
+Object.assign(
+  previousState,
+  {quantity: state.quantity + 1},
+  {quantity: state.quantity + 1},
+  ...
+)
+```
+后调用的 setState() 将覆盖同一周期内先调用 setState 的值，因此商品数仅增加一次。如果后续状态取决于当前状态，我们建议使用 updater 函数的形式代替：
+```jsx
+this.setState((state) => {
+  return {quantity: state.quantity + 1};
+});
+```
+
+#### forceUpdate()
+
+```jsx
+component.forceUpdate(callback)
+```
+
+默认情况下，当组件的 state 或 props 发生变化时，组件将重新渲染。如果 render() 方法依赖于其他数据，则可以调用 forceUpdate() 强制让组件重新渲染。
+
+调用 forceUpdate() 将致使组件调用 render() 方法，此操作会跳过该组件的 shouldComponentUpdate()。但其子组件会触发正常的生命周期方法，包括 shouldComponentUpdate() 方法。如果标记发生变化，React 仍将只更新 DOM。
+
+通常你应该避免使用 forceUpdate()，尽量在 render() 中使用 this.props 和 this.state。
+
+### Class 属性
+
+#### defaultProps
+
+defaultProps 可以为 Class 组件添加默认 props。这一般用于 props 未赋值，但又不能为 null 的情况。例如：
+
+```jsx
+class CustomButton extends React.Component {
+  // ...
+}
+
+CustomButton.defaultProps = {
+  color: 'blue'
+};
+```
+
+如果未提供 props.color，则默认设置为 'blue'.
+
+```jsx
+render() {
+  return <CustomButton /> ; // props.color 将设置为 'blue'
+}
+```
+
+如果 props.color 被设置为 null，则它将保持为 null
+```jsx
+render() {
+  return <CustomButton color={null} /> ; // props.color 将保持是 null
+}
+```
+
+#### displayName
+
+displayName 字符串多用于调试消息。通常，你不需要设置它，因为它可以根据函数组件或 class 组件的名称推断出来。
+
+### 实例属性
+
+#### props
+
+this.props 包括被该组件调用者定义的 props。
+
+需特别注意，this.props.children 是一个特殊的 prop，通常由 JSX 表达式中的子组件组成，而非组件本身定义。
+
+#### state
+
+组件中的 state 包含了随时可能发生变化的数据。state 由用户自定义，它是一个普通 JavaScript 对象。
+
+如果某些值未用于渲染或数据流（例如，计时器 ID），则不必将其设置为 state。此类值可以在组件实例上定义。
+
+永远不要直接改变 this.state，因为后续调用的 setState() 可能会替换掉你的改变。请把 this.state 看作是不可变的。
+
+### ReactDOM
+
+react-dom 的 package 提供了可在应用顶层使用的 DOM（DOM-specific）方法，如果有需要，你可以把这些方法用于 React 模型以外的地方。不过一般情况下，大部分组件都不需要使用这个模块。
+
++ render()
++ hydrate()
++ unmountComponentAtNode()
++ findDOMNode()
++ createPortal()
+
+#### render()
+```jsx
+ReactDOM.render(element, container[, callback])
+```
+在提供的 container 里渲染一个 React 元素，并返回对该组件的引用（或者针对无状态组件返回 null）。
+
+如果 React 元素之前已经在 container 里渲染过，这将会对其执行更新操作，并仅会在必要时改变 DOM 以映射最新的 React 元素。
+
+如果提供了可选的回调函数，该回调将在组件被渲染或更新之后被执行。
+
+
+> ReactDOM.render() 会控制你传入容器节点里的内容。当首次调用时，容器节点里的所有 DOM 元素都会被替换，后续的调用则会使用 React 的 DOM 差分算法（DOM diffing algorithm）进行高效的更新。
+>
+>ReactDOM.render() 不会修改容器节点（只会修改容器的子节点）。可以在不覆盖现有子节点的情况下，将组件插入已有的 DOM 节点中。
+>
+>ReactDOM.render() 目前会返回对根组件 ReactComponent 实例的引用。 但是，目前应该避免使用返回的引用，因为它是历史遗留下来的内容，而且在未来版本的 React 中，组件渲染在某些情况下可能会是异步的。 如果你真的需要获得对根组件 ReactComponent 实例的引用，那么推荐为根元素添加 callback ref。
+>
+>使用 ReactDOM.render() 对服务端渲染容器进行 hydrate 操作的方式已经被废弃，并且会在 React 17 被移除。作为替代，请使用 hydrate()。
+
+#### hydrate()
+
+```jsx
+ReactDOM.hydrate(element, container[, callback])
+```
+
+与 render() 相同，但它用于在 ReactDOMServer 渲染的容器中对 HTML 的内容进行 hydrate 操作。React 会尝试在已有标记上绑定事件监听器。
+
+React 希望服务端与客户端渲染的内容完全一致。React 可以弥补文本内容的差异，但是你需要将不匹配的地方作为 bug 进行修复。在开发者模式下，React 会对 hydration 操作过程中的不匹配进行警告。但并不能保证在不匹配的情况下，修补属性的差异。由于性能的关系，这一点非常重要，因为大多是应用中不匹配的情况很少见，并且验证所有标记的成本非常昂贵。
+
+如果单个元素的属性或者文本内容，在服务端和客户端之间有无法避免差异（比如：时间戳），则可以为元素添加 suppressHydrationWarning={true} 来消除警告。这种方式只在一级深度上有效，应只作为一种应急方案（escape hatch）。请不要过度使用！除非它是文本内容，否则 React 仍不会尝试修补差异，因此在未来的更新之前，仍会保持不一致。
+
+如果你执意要在服务端与客户端渲染不同内容，你可以采用双重（two-pass）渲染。在客户端渲染不同内容的组件可以读取类似于 this.state.isClient 的 state 变量，你可以在 componentDidMount() 里将它设置为 true。这种方式在初始渲染过程中会与服务端渲染相同的内容，从而避免不匹配的情况出现，但在 hydration 操作之后，会同步进行额外的渲染操作。注意，因为进行了两次渲染，这种方式会使得组件渲染变慢，请小心使用。
+
+记得保证弱网环境下的用户体验。JavaScript 代码的加载要比最初的 HTML 渲染晚的多。因此如果你只在客户端渲染不同的内容，其转换可能会不稳定。但是，如果执行顺利，那么在服务端负责渲染的 shell 会对渲染提供帮助，并且只显示客户端上额外的小组件。欲了解如何在不出现标记不匹配的情况下执行此操作，请参考上一段的解释。
+
+#### unmountComponentAtNode()
+
+```jsx
+ReactDOM.unmountComponentAtNode(container)
+```
+
+从 DOM 中卸载组件，会将其事件处理器（event handlers）和 state 一并清除。如果指定容器上没有对应已挂载的组件，这个函数什么也不会做。如果组件被移除将会返回 true，如果没有组件可被移除将会返回 false。
+
+#### findDOMNode()
+
+> findDOMNode 是一个访问底层 DOM 节点的应急方案（escape hatch）。在大多数情况下，不推荐使用该方法，因为它会破坏组件的抽象结构。严格模式下该方法已弃用。
+
+```jsx
+ReactDOM.findDOMNode(component)
+```
+如果组件已经被挂载到 DOM 上，此方法会返回浏览器中相应的原生 DOM 元素。此方法对于从 DOM 中读取值很有用，例如获取表单字段的值或者执行 DOM 检测（performing DOM measurements）。大多数情况下，你可以绑定一个 ref 到 DOM 节点上，可以完全避免使用 findDOMNode。
+
+当组件渲染的内容为 null 或 false 时，findDOMNode 也会返回 null。当组件渲染的是字符串时，findDOMNode 返回的是字符串对应的 DOM 节点。从 React 16 开始，组件可能会返回有多个子节点的 fragment，在这种情况下，findDOMNode 会返回第一个非空子节点对应的 DOM 节点。
+
+
+> findDOMNode 只在已挂载的组件上可用（即，已经放置在 DOM 中的组件）。如果你尝试调用未挂载的组件（例如在一个还未创建的组件上调用 render() 中的 findDOMNode()）将会引发异常。
+>
+> findDOMNode 不能用于函数组件。
+
+#### createPortal()
+
+```jsx
+ReactDOM.createPortal(child, container)
+```
+
+创建 portal。Portal 将提供一种将子节点渲染到 DOM 节点中的方式，该节点存在于 DOM 组件的层次结构之外。
+
+
+### ReactDOMServer
+
+ReactDOMServer 对象允许你将组件渲染成静态标记。通常，它被使用在 Node 服务端上：
+
+```jsx
+// ES modules
+import ReactDOMServer from 'react-dom/server';
+// CommonJS
+var ReactDOMServer = require('react-dom/server');
+```
+
+下述方法可以被使用在服务端和浏览器环境。
+
++ renderToString()
++ renderToStaticMarkup()
+
+下述附加方法依赖一个只能在服务端使用的 package（stream）。它们在浏览器中不起作用。
+
++ renderToNodeStream()
++ renderToStaticNodeStream()
+
+#### renderToString()
+
+```jsx
+ReactDOMServer.renderToString(element)
+```
+将 React 元素渲染为初始 HTML。React 将返回一个 HTML 字符串。你可以使用此方法在服务端生成 HTML，并在首次请求时将标记下发，以加快页面加载速度，并允许搜索引擎爬取你的页面以达到 SEO 优化的目的。
+
+
+如果你在已有服务端渲染标记的节点上调用 ReactDOM.hydrate() 方法，React 将会保留该节点且只进行事件处理绑定，从而让你有一个非常高性能的首次加载体验
+
+#### renderToStaticMarkup()
+
+```jsx
+ReactDOMServer.renderToStaticMarkup(element)
+```
+
+此方法与 renderToString 相似，但此方法不会在 React 内部创建的额外 DOM 属性，例如 data-reactroot。如果你希望把 React 当作静态页面生成器来使用，此方法会非常有用，因为去除额外的属性可以节省一些字节。
+
+如果你计划在前端使用 React 以使得标记可交互，请不要使用此方法。你可以在服务端上使用 renderToString 或在前端上使用 ReactDOM.hydrate() 来代替此方法。
+
+
+#### renderToNodeStream()
+
+```jsx
+ReactDOMServer.renderToNodeStream(element)
+```
+
+将一个 React 元素渲染成其初始 HTML。返回一个可输出 HTML 字符串的可读流。通过可读流输出的 HTML 完全等同于 ReactDOMServer.renderToString 返回的 HTML。你可以使用本方法在服务器上生成 HTML，并在初始请求时将标记下发，以加快页面加载速度，并允许搜索引擎抓取你的页面以达到 SEO 优化的目的。
+
+如果你在已有服务端渲染标记的节点上调用 ReactDOM.hydrate() 方法，React 将会保留该节点且只进行事件处理绑定，从而让你有一个非常高性能的首次加载体验。
+
+> 这个 API 仅允许在服务端使用。不允许在浏览器使用。
+>
+> 通过本方法返回的流会返回一个由 utf-8 编码的字节流。如果你需要另一种编码的流，请查看像 iconv-lite 这样的项目，它为转换文本提供了转换流。
+
+#### renderToStaticNodeStream()
+
+```jsx
+ReactDOMServer.renderToStaticNodeStream(element)
+```
+
+此方法与 renderToNodeStream 相似，但此方法不会在 React 内部创建的额外 DOM 属性，例如 data-reactroot。如果你希望把 React 当作静态页面生成器来使用，此方法会非常有用，因为去除额外的属性可以节省一些字节。
+
+通过可读流输出的 HTML，完全等同于 ReactDOMServer.renderToStaticMarkup 返回的 HTML。
+
+如果你计划在前端使用 React 以使得标记可交互，请不要使用此方法。你可以在服务端上使用 renderToNodeStream 或在前端上使用 ReactDOM.hydrate() 来代替此方法。
+
+> 此 API 仅限于服务端使用，在浏览器中是不可用的。
+>
+> 通过本方法返回的流会返回一个由 utf-8 编码的字节流。如果你需要另一种编码的流，请查看像 iconv-lite 这样的项目，它为转换文本提供了转换流。
