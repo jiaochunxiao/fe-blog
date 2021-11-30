@@ -972,3 +972,5 @@ ReactDOMServer.renderToStaticNodeStream(element)
 > 此 API 仅限于服务端使用，在浏览器中是不可用的。
 >
 > 通过本方法返回的流会返回一个由 utf-8 编码的字节流。如果你需要另一种编码的流，请查看像 iconv-lite 这样的项目，它为转换文本提供了转换流。
+
+### DOM元素
