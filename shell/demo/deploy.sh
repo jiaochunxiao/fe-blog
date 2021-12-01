@@ -3,13 +3,13 @@
 set -e
 
 # rnBranch=$1
-rnBranch='master'
+rnBranch='feature-mobile-panmin'
 # appBranch=$2
 appBranch='dev'
 
 cloneReactNative() {
   mkdir -p weishi-app/weishi-app-rn
-  git clone -b $rnBranch  http://git.xxx.com/weishi-fe/weishi-app-rn.git ./weishi-app/weishi-app-rn/
+  git clone -b $rnBranch  http://git.baijia.com/weishi-fe/weishi-app-rn.git ./weishi-app/weishi-app-rn/
   cd ./weishi-app/weishi-app-rn/
   npm i
   npm run build-android
@@ -17,18 +17,18 @@ cloneReactNative() {
 }
 
 cloneNative() {
-  git clone -b $appBranch http://git.xxx.com/weishi/weishi-app-android.git
+  git clone -b $appBranch http://git.baijia.com/weishi/weishi-app-android.git
 }
 
 copyFiles() {
-  cp -f weishi-app-rn/build/android/main.jsbundle android/weishi-app-android/app/src/main/assets/
-  cp -r weishi-app-rn/build/android/ android/weishi-app-android/app/src/main/res/
+  cp -f weishi-app-rn/build/android/main.jsbundle android/weishi-android-app/app/src/main/assets/
+  cp -r weishi-app-rn/build/android/ android/weishi-android-app/app/src/main/res/
 }
 
 # osx
 # Unlike Ubuntu, OS X requires the extension to be explicitly specified. The workaround is to set an empty string:
 sedFile() {
-  sed -i '' '20s/4.11.0/4.8.0/g' node_modules/react-native-fast-image/android/build.gradle
+  # sed -i '' '20s/4.11.0/4.8.0/g' node_modules/react-native-fast-image/android/build.gradle
 
   sed -i '' '4s/rootProject.ext.compileSdkVersion/29/g' node_modules/react-native-image-picker/android/build.gradle
   sed -i '' '8s/rootProject.ext.targetSdkVersion/28/g' node_modules/react-native-image-picker/android/build.gradle
@@ -62,9 +62,11 @@ then
     mkdir -p android
     cd android/
     cloneNative
+    mv weishi-app-android weishi-android-app
     cd ../weishi-app-rn
-    cp -rf -i package.json package-lock.json node_modules ../
+    cp -rf -i package.json package-lock.json ../
     cd ../
+    npm i
     copyFiles
     rm -rf weishi-app-rn/
   fi
