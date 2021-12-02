@@ -1085,3 +1085,32 @@ Style 中的 key 采用小驼峰命名是为了与 JS 访问 DOM 节点的属性
 
 
 ### 合成事件
+
+
+#### 概览
+
+SyntheticEvent 实例将被传递给你的事件处理函数，它是浏览器的原生事件的跨浏览器包装器。除兼容所有浏览器外，它还拥有和浏览器原生事件相同的接口，包括 stopPropagation() 和 preventDefault()。
+
+如果因为某些原因，当你需要使用浏览器的底层事件时，只需要使用 **nativeEvent** 属性来获取即可。合成事件与浏览器的原生事件不同，也不会直接映射到原生事件。例如，在 onMouseLeave 事件中 event.nativeEvent 将指向 mouseout 事件。每个 SyntheticEvent 对象都包含以下属性：
+```
+boolean bubbles
+boolean cancelable
+DOMEventTarget currentTarget
+boolean defaultPrevented
+number eventPhase
+boolean isTrusted
+DOMEvent nativeEvent
+void preventDefault()
+boolean isDefaultPrevented()
+void stopPropagation()
+boolean isPropagationStopped()
+void persist()
+DOMEventTarget target
+number timeStamp
+string type
+```
+
+> 从 v17 开始，e.persist() 将不再生效，因为 SyntheticEvent 不再放入事件池中。
+
+> 从 v0.14 开始，事件处理器返回 false 时，不再阻止事件传递。你可以酌情手动调用 e.stopPropagation() 或 e.preventDefault() 作为替代方案。
+
