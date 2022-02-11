@@ -12,7 +12,7 @@
     "immutability-helper": "^3.1.1",
     "less": "^4.0.0",
     "less-loader": "^7.2.1",
-    "node-sass": "4.14.1",
+    "node-sass": "7.0.0",
     "rc-field-form": "^1.17.4",
     "rc-form": "2.1.0",
     "react": "^17.0.1",
