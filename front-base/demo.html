@@ -1,0 +1,1298 @@
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta charset='utf-8'>
+  <!-- 优先使用 IE 最新版本和 Chrome -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <!-- 页面描述 -->
+  <meta name="description" content="" />
+  <!-- 页面关键词 -->
+  <meta name="keywords" content="" />
+  <!-- 网页作者 -->
+  <meta name="author" content="lingfeng_ai, hanxiaomx@qq.com" />
+  <!-- 搜索引擎抓取 -->
+  <meta name="robots" content="index,follow" />
+  <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+  <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link type="text/css" rel="stylesheet" href="http://hizzgdev.github.io/jsmind/style/jsmind.css" />
+  <link href="https://cdn.bootcss.com/octicons/4.4.0/font/octicons.css" rel="stylesheet">
+  <script type="text/javascript" src="http://hizzgdev.github.io/jsmind/js/jsmind.js" charset="utf-8"></script>
+  <style type="text/css">
+    #notepad {
+      width: 50%;
+      margin: 0 auto;
+      padding: 5px;
+      font-size: 40px;
+      word-wrap: break-word;
+    }
+
+    .note {
+      text-align: center;
+      position: fixed;
+      width: 99%;
+      height: 80px;
+      top: 0;
+      left: 0;
+      z-index: 50;
+    }
+
+    .pop-title {
+      background-color: #cc4c76;
+      color: #ffffff;
+      margin: -1px;
+    }
+
+    .pop-content {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .modal-header-style {
+      background: steelblue;
+      color: white;
+    }
+
+    .shortcuts {}
+
+    .shortcuts span {
+      color: #4682b4;
+      margin-left: 15px;
+      text-align: center;
+      font-family: monospace;
+    }
+
+    .shortcuts ul li {
+      font-size: 18px;
+    }
+
+    .shortcuts .key {
+      font-size: 18px;
+    }
+
+    @import "http://designmodo.github.io/Flat-UI/dist/css/flat-ui.min.css";
+    @import "https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css";
+    @import "https://daneden.github.io/animate.css/animate.min.css";
+
+    /*-------------------------------*/
+
+
+    /*           VARIABLES           */
+
+
+    /*-------------------------------*/
+
+    body {
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body,
+    html {
+      height: 100%;
+      background: #2b5876;
+      /* fallback for old browsers */
+      background: -webkit-linear-gradient(to right, #4e4376, #2b5876);
+      /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to right, #4e4376, #2b5876);
+      /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    .nav .open>a {
+      background-color: transparent;
+    }
+
+    .nav .open>a:hover {
+      background-color: transparent;
+    }
+
+    .nav .open>a:focus {
+      background-color: transparent;
+    }
+
+
+    /*-------------------------------*/
+
+
+    /*           Wrappers            */
+
+
+    /*-------------------------------*/
+
+    #wrapper {
+      -moz-transition: all 0.5s ease;
+      -o-transition: all 0.5s ease;
+      -webkit-transition: all 0.5s ease;
+      padding-left: 0;
+      transition: all 0.5s ease;
+    }
+
+    #wrapper.toggled {
+      padding-left: 420px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+      width: 420px;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+      margin-right: -420px;
+    }
+
+    #sidebar-wrapper {
+      -moz-transition: all 0.5s ease;
+      -o-transition: all 0.5s ease;
+      -webkit-transition: all 0.5s ease;
+      background: #1a1a1a;
+      height: 100%;
+      left: 420px;
+      margin-left: -420px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      transition: all 0.5s ease;
+      width: 0;
+      z-index: 1000;
+    }
+
+    #sidebar-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    #page-content-wrapper {
+      padding-top: 70px;
+      width: 100%;
+    }
+
+
+    /*-------------------------------*/
+
+
+    /*     Sidebar nav styles        */
+
+
+    /*-------------------------------*/
+
+    .sidebar-nav {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      top: 0;
+      width: 450px;
+    }
+
+    .sidebar-nav li {
+      display: inline-block;
+      line-height: 12px;
+      position: relative;
+      width: 100%;
+      /*text-align: justify;*/
+    }
+
+    .sidebar-nav li:before {
+      background-color: #1c1c1c;
+      content: '';
+      height: 100%;
+      left: 0;
+      position: absolute;
+      top: 0;
+      -webkit-transition: width 0.2s ease-in;
+      transition: width 0.2s ease-in;
+      width: 3px;
+      z-index: -1;
+    }
+
+    .current-nav {
+      background-color: #65cee7;
+      display: block;
+    }
+
+    .not-current-nav {}
+
+    .sidebar-nav li:first-child a {
+      background-color: #3b5998;
+      color: #ffffff;
+    }
+
+    .sidebar-nav li:nth-child(2):before {
+      background-color: #93daea;
+    }
+
+    .sidebar-nav li:nth-child(3):before {
+      background-color: #93daea;
+    }
+
+    .sidebar-nav li:nth-child(4):before {
+      background-color: #65cee7;
+    }
+
+    .sidebar-nav li:nth-child(5):before {
+      background-color: #65cee7;
+    }
+
+    .sidebar-nav li:nth-child(6):before {
+      background-color: #65cee7;
+    }
+
+    .sidebar-nav li:nth-child(7):before {
+      background-color: #4db9d3;
+    }
+
+    .sidebar-nav li:nth-child(8):before {
+      background-color: #4db9d3;
+    }
+
+    .sidebar-nav li:nth-child(9):before {
+      background-color: #4db9d3;
+    }
+
+    .sidebar-nav li:nth-child(10):before {
+      background-color: #37a6c1;
+    }
+
+    .sidebar-nav li:nth-child(11):before {
+      background-color: #37a6c1;
+    }
+
+    .sidebar-nav li:nth-child(12):before {
+      background-color: #37a6c1;
+    }
+
+    .sidebar-nav li:nth-child(13):before {
+      background-color: #37a6c1;
+    }
+
+    .sidebar-nav li:hover:before {
+      -webkit-transition: width 0.2s ease-in;
+      transition: width 0.2s ease-in;
+      width: 100%;
+    }
+
+    .sidebar-nav li a {
+      color: #dddddd;
+      display: block;
+      padding: 10px 15px 10px 30px;
+      text-decoration: none;
+    }
+
+    .sidebar-nav li.open:hover before {
+      -webkit-transition: width 0.2s ease-in;
+      transition: width 0.2s ease-in;
+      width: 100%;
+    }
+
+    .sidebar-nav .dropdown-menu {
+      background-color: #222222;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      width: 100%;
+    }
+
+    .sidebar-nav li a:active,
+    .sidebar-nav li a:focus,
+    .sidebar-nav li.open a:active,
+    .sidebar-nav li.open a:focus {
+      background-color: #65cee7;
+      color: #000000;
+      text-decoration: none;
+    }
+
+    .sidebar-nav li a:hover,
+    .sidebar-nav li.open a:hover {
+      background-color: transparent;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .sidebar-nav>.sidebar-brand {
+      font-size: 20px;
+      height: 65px;
+      line-height: 44px;
+    }
+
+
+    /*-------------------------------*/
+
+
+    /*       Hamburger-Cross         */
+
+
+    /*-------------------------------*/
+
+    .help {
+      background: transparent;
+      border: none;
+      display: block;
+      height: 32px;
+      margin-right: 12px;
+      position: fixed;
+      top: 20px;
+      width: 32px;
+      z-index: 999;
+      font-size: 30px;
+      color: rgba(255, 255, 255, 0.57);
+      right: 10px;
+    }
+
+    .donate {
+      background: transparent;
+      border: none;
+      display: block;
+      height: 32px;
+      margin-right: 12px;
+      position: fixed;
+      top: 24px;
+      z-index: 999;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.57);
+      right: 70px;
+    }
+
+    .github-star {}
+
+    .qrcode {
+      text-align: center;
+    }
+
+    .qrcode img {
+      max-width: 100px;
+      box-shadow: 1px 0px 5px 2px;
+    }
+
+    .qrcode p {
+      margin-top: 10px;
+    }
+
+    .comment {
+      margin-top: 10px;
+    }
+
+    .hamburger {
+      background: transparent;
+      border: none;
+      display: block;
+      height: 32px;
+      margin-left: 15px;
+      position: fixed;
+      top: 20px;
+      width: 32px;
+      z-index: 999;
+    }
+
+    .hamburger:hover {
+      outline: none;
+    }
+
+    .hamburger:focus {
+      outline: none;
+    }
+
+    .hamburger:active {
+      outline: none;
+    }
+
+    .hamburger.is-closed:before {
+      -webkit-transform: translate3d(0, 0, 0);
+      -webkit-transition: all 0.35s ease-in-out;
+      color: #3b5998;
+      content: '';
+      display: block;
+      font-size: 14px;
+      line-height: 32px;
+      opacity: 0;
+      text-align: center;
+      width: 100px;
+    }
+
+    .hamburger.is-closed:hover before {
+      -webkit-transform: translate3d(-100px, 0, 0);
+      -webkit-transition: all 0.35s ease-in-out;
+      display: block;
+      opacity: 1;
+    }
+
+    .hamburger.is-closed:hover .hamb-top {
+      -webkit-transition: all 0.35s ease-in-out;
+      top: 0;
+    }
+
+    .hamburger.is-closed:hover .hamb-bottom {
+      -webkit-transition: all 0.35s ease-in-out;
+      bottom: 0;
+    }
+
+    .hamburger.is-closed .hamb-top {
+      -webkit-transition: all 0.35s ease-in-out;
+      background-color: rgba(255, 255, 255, 0.7);
+      top: 5px;
+    }
+
+    .hamburger.is-closed .hamb-middle {
+      background-color: rgba(255, 255, 255, 0.7);
+      margin-top: -2px;
+      top: 50%;
+    }
+
+    .hamburger.is-closed .hamb-bottom {
+      -webkit-transition: all 0.35s ease-in-out;
+      background-color: rgba(255, 255, 255, 0.7);
+      bottom: 5px;
+    }
+
+    .hamburger.is-closed .hamb-top,
+    .hamburger.is-closed .hamb-middle,
+    .hamburger.is-closed .hamb-bottom,
+    .hamburger.is-open .hamb-top,
+    .hamburger.is-open .hamb-middle,
+    .hamburger.is-open .hamb-bottom {
+      height: 4px;
+      left: 0;
+      position: absolute;
+      width: 100%;
+    }
+
+    .hamburger.is-open .hamb-top {
+      -webkit-transform: rotate(45deg);
+      -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.73, 1, 0.28, 0.08);
+      background-color: #ffffff;
+      margin-top: -2px;
+      top: 50%;
+    }
+
+    .hamburger.is-open .hamb-middle {
+      background-color: #ffffff;
+      display: none;
+    }
+
+    .hamburger.is-open .hamb-bottom {
+      -webkit-transform: rotate(-45deg);
+      -webkit-transition: -webkit-transform 0.2s cubic-bezier(0.73, 1, 0.28, 0.08);
+      background-color: #ffffff;
+      margin-top: -2px;
+      top: 50%;
+    }
+
+    .hamburger.is-open:before {
+      -webkit-transform: translate3d(0, 0, 0);
+      -webkit-transition: all 0.35s ease-in-out;
+      color: #ffffff;
+      content: '';
+      display: block;
+      font-size: 14px;
+      line-height: 32px;
+      opacity: 0;
+      text-align: center;
+      width: 100px;
+    }
+
+    .hamburger.is-open:hover before {
+      -webkit-transform: translate3d(-100px, 0, 0);
+      -webkit-transition: all 0.35s ease-in-out;
+      display: block;
+      opacity: 1;
+    }
+
+    .about {
+      margin-top: 50px;
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .about h3 {
+      font-size: 25px;
+      color: #fff;
+      text-align: center;
+    }
+
+    .about a {
+      font-size: 18px;
+      color: #0ce018;
+      text-align: center;
+    }
+
+    .about h3:after {
+      height: 1px;
+      color: #ffffff;
+    }
+
+    .about p {
+      margin-left: 20px;
+      font-size: 15px;
+      color: #fff;
+    }
+
+    .author {
+      font-size: 10px;
+    }
+
+    .infodropdown a,
+    li {
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-default navbar-fixed-bottom">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <a class="navbar-brand"
+          href="https://github.com/hanxiaomax/WordPowerMadeEasy/blob/master/Word%20Power%20Made%20Easy.Norman%20Lewis.%E6%96%87%E5%AD%97%E6%89%AB%E6%8F%8F%E7%89%88.pdf"><span
+            class="glyphicon glyphicon-book" aria-hidden="true"></span> <i> Word Power Made Easy</i> <span
+            class="author">by Norman Lewis</span></a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown" class="infodropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+              aria-expanded="false"><span class="octicon octicon-octoface" aria-hidden="true"></span> 关注作者 <span
+                class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="https://www.zhihu.com/people/lingfeng/activities">知乎</a></li>
+              <li><a href="https://github.com/hanxiaomax/WordPowerMadeEasy">GitHub</a></li>
+            </ul>
+          </li>
+          <li class="dropdown" class="infodropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+              aria-expanded="false">关于 <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="#" id="copyright"></a>
+              </li>
+              <li>
+                <a href="#" id="version"></a>
+              </li>
+              <li>
+                <a href="#" id="liscence"></a>
+              </li>
+              <li role="separator" class="divider"></li>
+              <li>
+                <a href="https://github.com/hizzgdev/jsmind" id="">Powered by Jsmind</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container-fluid -->
+  </nav>
+  <div class="container-fluid">
+    <div class="row" id="wrapper">
+      <nav class="navbar navbar-inverse navbar-fixed-top" id="sidebar-wrapper" role="navigation">
+        <ul class="nav sidebar-nav">
+          <li class="sidebar-brand">
+            <a href="#">目录</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_personality.json');">1. Talk About Personality</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_doctors.json');">2. Talk About Doctors</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_various_practitioners.json');">3. Talk About Various
+              Practitioners</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_vscience_and_scientist.json');">4.Talk About Science And
+              Scientist</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_liars_and_lying.json');">5. Talk About Liars And Lying</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_actions.json');">6. Talk About Actions</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_various_speech_habits.json');">7. Talk About Various
+              Speech Habits</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_insult_your_enemies.json');">8. Insult Your Enemies</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_flatter_your_friends.json');">9. Flatter Your Friends</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_common_phenomena_and_occurrences.json');">10. Talk About
+              Common Phenomena And Occurrences</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('how_to_talk_about_what_goes_on.json');">11. Talk About What Goes On</a>
+          </li>
+          <li>
+            <a href="#" onclick="open_ajax('How_to_talk_about_a_variety_of_personal_characteristics.json');">12. Talk
+              About a Variety of Personal Characteristics</a>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-plus"></i> More... <span
+                class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li class="dropdown-header"></li>
+              <li><a href="https://github.com/hanxiaomax/WordPowerMadeEasy">文字笔记</a></li>
+              <!-- <li><a href="#" onclick="   ">学习资源</a></li> -->
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <div id="page-content-wrapper">
+        <button type="button" class="hamburger is-closed animated fadeInLeft" data-toggle="offcanvas">
+          <span class="hamb-top"></span>
+          <span class="hamb-middle"></span>
+          <span class="hamb-bottom"></span>
+        </button>
+        <button type="button" class="help is-closed animated fadeInLeft" data-toggle="modal"
+          data-target="#Helpinfomodal">
+          <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="donate" data-toggle="modal" data-target="#donate">赞助</button>
+        <div id="jsmind_container" data-dismiss="offcanvas"></div>
+      </div>
+    </div>
+  </div>
+  <!-- help info -->
+  <!-- Modal -->
+  <div class="modal fade" id="Helpinfomodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header modal-header-style
+">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h3 class="modal-title" id="myModalLabel">Help</h3>
+        </div>
+        <div class="modal-body">
+          <div class="shortcuts">
+            <h3>快捷键</h3>
+            <div class="container">
+              <div class="col-sm-4">1. 放大</div>
+              <div class="col-sm-8"><span>Zoom(I)n</span></div>
+              <div class="col-sm-4">2. 缩小</div>
+              <div class="col-sm-8"><span>Zoom(O)ut</span></div>
+              <div class="col-sm-4">3. 全部展开</div>
+              <div class="col-sm-8"><span>(E)xpand</span> </div>
+              <div class="col-sm-4">4. 全部收起</div>
+              <div class="col-sm-8"><span>(C)ollapse</span></div>
+              <div class="col-sm-4">5. 展开</div>
+              <div class="col-sm-8"><span>(Spance)</span></div>
+              <div class="col-sm-4">6. 导航</div>
+              <div class="col-sm-8"><span>↑&nbsp↓&nbsp←&nbsp→&nbsp</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" tabindex="-1" role="dialog" id='donate' aria-labelledby="donate ">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header modal-header-style">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="gridSystemModalLabel">赞助</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-sm-12">
+              如果您觉得有所收获，可以通过以下方式来支持我 ：）
+              <ul>
+                <li>
+                  你可以在知乎关注<a href="https://www.zhihu.com/people/lingfeng/">@Lingfeng Ai</a>
+                </li>
+                <li>天气这么热，你也可以
+                  <a data-container="body" data-toggle="popover-qrcode" data-placement="left" data-content='<div class="modal-body qrcode">
+                                    <div class="row">
+                                        <div class="col-sm-6"><img src="static/imgs/WeChanQR.png"></div>
+                                        <div class="col-sm-6 "><img src="static/imgs/AliPayQR.png"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <p>微信</p>
+                                        </div>
+                                        <div class="col-sm-6 ">
+                                            <p>支付宝</p>
+                                        </div>
+                                    </div>
+                                </div>'>
+                    打赏
+                  </a> 小艾一根冰棒~
+                </li>
+                <li>也可以购买扇贝单词书<a href="https://www.shanbay.com/wordbook/107125/"><i>Word Power Made Easy</i></a></li>
+                <li>如果你使用 GitHub，也欢迎你为此项目</a>点上一颗星星
+                  <iframe class="github-star"
+                    src="https://ghbtns.com/github-btn.html?user=hanxiaomax&repo=WordPowerMadeEasy&type=star&count=true&size=small"
+                    frameborder="0" scrolling="0" width="170px" height="20px"></iframe>
+                </li>
+              </ul>
+            </div>
+            <div class="col-sm-12 comment">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+  <script type="text/javascript" src="https://libs.baidu.com/jquery/1.11.3/jquery.min.js"></script>
+  <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    const mind = {
+      "meta": {
+        "version": "0.2",
+        "name": "jsMind-demo-tree",
+        "author": "hizzgdev@163.com"
+      },
+      "data": {
+        "topic": "How To Talk About Personality",
+        "id": "root",
+        "children": [
+          {
+            "topic": "<div data-toggle='popover' data-content='利己主义者'>1.egoist</div>",
+            "direction": "right",
+            "expanded": false,
+            "id": 1,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='I,self'>ego<div>testsetsetst</div></div>",
+                "expanded": false,
+                "id": 2,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='自我'>ego</div>",
+                    "expanded": false,
+                    "id": 3,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='自我为中心的'>egocentric</div>",
+                    "expanded": false,
+                    "id": 4,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='极端利己主义者, 极端自我主义者,自大狂'>egomaniac</div>",
+                    "expanded": false,
+                    "id": 5,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='极端利己的'>egomaniacal</div>",
+                    "expanded": false,
+                    "id": 6,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='自大的人'>2.egotist</div>",
+            "direction": "right",
+            "expanded": false,
+            "id": 7,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='other'>alter</div>",
+                "expanded": false,
+                "id": 8,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='利他主义'>alism</div>",
+                    "expanded": false,
+                    "id": 9,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='利他主义的'>altruistic</div>",
+                    "expanded": false,
+                    "id": 10,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='other possible 替代物，skip one and take other 间隔，轮换'>alternate</div>",
+                    "expanded": false,
+                    "id": 11,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='other choice   替代物'>alternative</div>",
+                    "expanded": false,
+                    "id": 12,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='a verbal dispute 争吵'>altercation</div>",
+                    "expanded": false,
+                    "id": 13,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='a change 改变'>alteration</div>",
+                    "expanded": false,
+                    "id": 14,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='另一个我'>alter ego</div>",
+                    "expanded": false,
+                    "id": 15,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='利他主义者'>3.altruist</div>",
+            "direction": "right",
+            "expanded": false,
+            "id": 16,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='other'>alter</div>",
+                "expanded": false,
+                "id": 17,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='利他主义'>alism</div>",
+                    "expanded": false,
+                    "id": 18,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='利他主义的'>altruistic</div>",
+                    "expanded": false,
+                    "id": 19,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='other possible 替代物，skip one and take other 间隔，轮换'>alternate</div>",
+                    "expanded": false,
+                    "id": 20,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='other choice   替代物'>alternative</div>",
+                    "expanded": false,
+                    "id": 21,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='a verbal dispute 争吵'>altercation</div>",
+                    "expanded": false,
+                    "id": 22,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='a change 改变'>alteration</div>",
+                    "expanded": false,
+                    "id": 23,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='另一个我'>alter ego</div>",
+                    "expanded": false,
+                    "id": 24,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='内向的人'>4.introvert</div>",
+            "direction": "right",
+            "expanded": false,
+            "id": 25,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='inward   向内'>intro-</div>",
+                "expanded": false,
+                "id": 26,
+                "children": []
+              },
+              {
+                "topic": "<div data-toggle='popover' data-content='来自拉丁语 verto=to turn'>vert-</div>",
+                "expanded": false,
+                "id": 27,
+                "children": []
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='外向的人'>5.extrovert</div>",
+            "direction": "right",
+            "expanded": false,
+            "id": 28,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='outward 向外'>extro-</div>",
+                "expanded": false,
+                "id": 29,
+                "children": []
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='又内向又外向的普通人'>6.ambivert</div>",
+            "direction": "left",
+            "expanded": false,
+            "id": 30,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='both       向两个方向'>ambi-</div>",
+                "expanded": false,
+                "id": 31,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='左右手共用的人，两面派的，灵巧的。'>ambidextrous</div>",
+                    "expanded": false,
+                    "id": 32,
+                    "children": [
+                      {
+                        "topic": "<div data-toggle='popover' data-content='skillful'>Dexterous</div>",
+                        "expanded": false,
+                        "id": 33,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='skill'>Dexterity</div>",
+                        "expanded": false,
+                        "id": 34,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='拉丁语 右撇子（右手是熟练的手，所以是skill和skillful）'>Dexter</div>",
+                        "expanded": false,
+                        "id": 35,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='拉丁语 左撇子，英语 threating，dangerous，evil,源自祖先们对左撇子的误解和猜测'>sinister</div>",
+                        "expanded": false,
+                        "id": 36,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='法语 左撇子，英语 clumsy 笨拙的, 粗鲁的,不善交际的。'>gauche</div>",
+                        "expanded": false,
+                        "id": 37,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='法语 右撇子 ，英语里面变成 adroit 灵巧的，精明的，干练的。'>droit</div>",
+                        "expanded": false,
+                        "id": 38,
+                        "children": []
+                      }
+                    ]
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='两手俱技巧独特'>ambidextrity</div>",
+                    "expanded": false,
+                    "id": 39,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='反人类'>7.misanthrope</div>",
+            "direction": "left",
+            "expanded": false,
+            "id": 40,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='拉丁语 to hate'>misein</div>",
+                "expanded": false,
+                "id": 41,
+                "children": []
+              },
+              {
+                "topic": "<div data-toggle='popover' data-content='人类的'>anthropes</div>",
+                "expanded": false,
+                "id": 42,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='人类学'>anthropology</div>",
+                    "expanded": false,
+                    "id": 43,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='人类学家'>anthropologist</div>",
+                    "expanded": false,
+                    "id": 44,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='慈善家'>philanthropist</div>",
+                    "expanded": false,
+                    "id": 45,
+                    "children": [
+                      {
+                        "topic": "<div data-toggle='popover' data-content='爱'>phil-</div>",
+                        "expanded": false,
+                        "id": 46,
+                        "children": [
+                          {
+                            "topic": "<div data-toggle='popover' data-content=''>Philadelphia</div>",
+                            "expanded": false,
+                            "id": 47,
+                            "children": []
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='反女人'>8.misogynist</div>",
+            "direction": "left",
+            "expanded": false,
+            "id": 48,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='女人 woman'>gyne</div>",
+                "expanded": false,
+                "id": 49,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='妇科医生'>gynecologist</div>",
+                    "expanded": false,
+                    "id": 50,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='一夫多妻'>polygyny</div>",
+                    "expanded": false,
+                    "id": 51,
+                    "children": [
+                      {
+                        "topic": "<div data-toggle='popover' data-content='单一'>mono-</div>",
+                        "expanded": false,
+                        "id": 52,
+                        "children": []
+                      },
+                      {
+                        "topic": "<div data-toggle='popover' data-content='多的'>polys-</div>",
+                        "expanded": false,
+                        "id": 53,
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "topic": "<div data-toggle='popover' data-content='man,来自拉丁语andros'>andry</div>",
+                "expanded": false,
+                "id": 54,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='一妻多夫'>polyandry</div>",
+                    "expanded": false,
+                    "id": 55,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='反婚姻'>9.misogamist</div>",
+            "direction": "left",
+            "expanded": false,
+            "id": 56,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='婚姻,marriage'>gamos</div>",
+                "expanded": false,
+                "id": 57,
+                "children": [
+                  {
+                    "topic": "<div data-toggle='popover' data-content='一夫一妻制'>monogamy</div>",
+                    "expanded": false,
+                    "id": 58,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='重婚罪'>bigamy</div>",
+                    "expanded": false,
+                    "id": 59,
+                    "children": []
+                  },
+                  {
+                    "topic": "<div data-toggle='popover' data-content='一夫多妻或一妻多夫制'>polygamy</div>",
+                    "expanded": false,
+                    "id": 60,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "<div data-toggle='popover' data-content='禁欲主义者'>10.ascetic</div>",
+            "direction": "left",
+            "expanded": false,
+            "id": 61,
+            "children": [
+              {
+                "topic": "<div data-toggle='popover' data-content='拉丁语，monk，hermit'>asketes</div>",
+                "expanded": false,
+                "id": 62,
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      "format": "node_tree"
+    };
+    var options = {
+      container: 'jsmind_container',
+      theme: 'clouds',
+      editable: false,
+      support_html: true, // 是否支持节点里的HTML元素
+      view: {
+        hmargin: 100, // 思维导图距容器外框的最小水平距离
+        vmargin: 150, // 思维导图距容器外框的最小垂直距离
+        line_width: 3, // 思维导图线条的粗细
+        line_color: '#ffffff' // 思维导图线条的颜色
+      },
+      layout: {
+        hspace: 30, // 节点之间的水平间距
+        vspace: 30, // 节点之间的垂直间距
+        pspace: 20 // 节点收缩/展开控制器的尺寸
+      },
+      shortcut: {
+        enable: true, // 是否启用快捷键
+        handles: {
+          'zoomin': function (jm, e) {
+            jm.view.zoomIn();
+          },
+          'zoomout': function (jm, e) {
+            jm.view.zoomOut();
+          },
+          'collapse_all': function (jm, e) {
+            jm.collapse_all();
+          },
+          'expand_all': function (jm, e) {
+            jm.expand_all();
+          },
+        }, // 命名的快捷键事件处理器
+        mapping: { // 快捷键映射
+          toggle: 32, // <Space>
+          left: 37, // <Left>
+          up: 38, // <Up>
+          right: 39, // <Right>
+          down: 40, // <Down>
+          zoomin: 73, // i
+          zoomout: 79, //o_jm.collapse_all();
+          collapse_all: 67, //c
+          expand_all: 69 //d
+
+        }
+      },
+    };
+    var jm = new jsMind(options);
+
+
+    var pop_options = {
+      html: true,
+      container: 'body',
+      trigger: 'hover',
+      placement: 'top',
+      title: '释义',
+      template: '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title pop-title"></h3><div class="popover-content pop-content"></div></div>'
+    };
+    var qrcode_options = {
+      html: true,
+      container: 'body',
+      trigger: 'hover',
+      placement: 'right',
+      title: '感恩！',
+      template: '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title pop-title"></h3><div class="popover-content pop-content"></div></div>'
+    };
+
+    //切换导图后重新设置 meta 数据和 popup
+    function popsetup() {
+      $('[data-toggle="popover"]').popover(pop_options)
+      $("#copyright").html("作者:\t" + jm.get_meta()['author'])
+      $("#version").html("版本:\t" + jm.get_meta()['version'])
+      $("#liscence").html("许可:\tCC-BY-NC-ND 4.0")
+    }
+
+    function open_ajax(mind_url) {
+      // jsMind.util.ajax.get(mind_url, function(mind) {
+      //     window.g_current_mind = mind
+      //     jm.show(mind);
+      //     popsetup();
+      // });
+      window.g_current_mind = mind;
+      jm.show(mind);
+      popsetup();
+    }
+
+    function center_map() {
+      jm.show(g_current_mind)
+      popsetup();
+    }
+    $(document).ready(function () {
+      var trigger = $('.hamburger'),
+        isSideBarOpen = false;
+      trigger.click(function () {
+        hamburger_cross();
+      });
+
+      function close_sidebar() {
+        trigger.removeClass('is-open');
+        trigger.addClass('is-closed');
+        setTimeout(center_map, 500); //侧边栏关闭后，重新居中
+        isSideBarOpen = false;
+      }
+
+      function hamburger_cross() {
+        if (isSideBarOpen == true) {
+          close_sidebar();
+        } else {
+          trigger.removeClass('is-closed');
+          trigger.addClass('is-open');
+          isSideBarOpen = true;
+        }
+      }
+      //点击hamburger 开关侧边栏
+      $('[data-toggle="offcanvas"]').click(function () {
+        $('#wrapper').toggleClass('toggled');
+
+      });
+      //点击导图关闭侧边栏
+      $('[data-dismiss="offcanvas"]').click(function () {
+        if (isSideBarOpen) {
+          $('#wrapper').removeClass('toggled');
+          close_sidebar();
+        }
+
+      });
+      open_ajax('How_to_talk_about_personality.json');
+      $('[data-toggle="popover-qrcode"]').popover(qrcode_options)
+
+    });
+  </script>
+</body>
+
+</html>
