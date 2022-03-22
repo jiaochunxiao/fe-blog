@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .move_video_content {
+            position: relative;
+            width: 1000px;
+            height: 800px;
+            margin: 50px auto;
+            border: 1px solid #d0c9c9;
+        }
+
+        .video_content {
+            margin: 30px 25px;
+            overflow: hidden;
+        }
+
+        .video_div {
+            width: 600px;
+            height: 600px;
+            background-color: rgba(0, 0, 0, 0.5);
+            float: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video_p {
+            color: #FFFFFF;
+            width: fit-content;
+            font-size: 14px;
+            line-height: 60px;
+            position: absolute;
+            /* right: 0px;
+				top: 20px; */
+        }
+
+        .scroll_content {
+            width: 300px;
+            height: 600px;
+            float: left;
+            border: 1px solid #171C19;
+            margin-left: 40px;
+            position: relative;
+        }
+
+        .input_content {
+            text-align: center;
+        }
+
+        .input_text {
+            outline: none;
+            border: 1px solid #d2cccc;
+            width: 600px;
+            height: 40px;
+            font-size: 14px;
+            color: #000000;
+            padding: 0 15px;
+            border-radius: 5px;
+        }
+
+        input:focus {
+            border-color: #409eff;
+        }
+
+        .button_btn {
+            color: #fff;
+            width: 100px;
+            height: 40px;
+            border: 1px solid #409eff;
+            background-color: #409eff;
+            vertical-align: middle;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .scroll_ul {
+            border: 1px solid red;
+            width: 100%;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 0 15px 15px 15px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .scroll_ul::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scroll_li {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #000000;
+            list-style-type: none;
+        }
+
+        /* .anmite_left {
+            animation: mymove 2s linear infinite;
+        } */
+        @keyframes mymove {
+            0% {
+                left: 100%;
+                transform: translateX(0);
+            }
+            100% {
+                left: 0;
+                transform: translateX(-100%);
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="move_video_content">
+        <div class="video_content">
+            <div class="video_div" id="video_view"></div>
+            <div class="scroll_content">
+                <ul class="scroll_ul" id="scroll_ul_id"></ul>
+            </div>
+        </div>
+        <div class="input_content">
+            <input type="text" class="input_text" maxlength="30" placeholder="请输入要发送的弹幕" id="input_text_id">
+            <button type="button" class="button_btn" id="send_btn">发送</button>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    let inputText = document.getElementById("input_text_id");
+    let scrollContent = document.getElementById("scroll_ul_id");
+    let videoView = document.getElementById("video_view");
+    let videoWidth = videoView.offsetWidth; //直播区域的总宽度
+    let listHeight = videoView.offsetHeight / 10;
+    let listTopNum = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+
+    document.getElementById("send_btn").addEventListener("click", function () {
+        let value = inputText.value; //获取输入框的值
+        if (!value) return;
+        appendDom(value); //将输入框的值插入到滚动聊天中
+        createVideoBulletChatDom(value); //将输入框的值插入到弹幕中
+        // inputText.value = ''; //清空输入框
+        scrollContent.scrollTop = scrollContent.scrollHeight; //自动滚动到底部
+    })
+
+    function appendDom(value) { //将输入框的值插入到滚动聊天中
+        let li = document.createElement("li");
+        li.setAttribute("class", "scroll_li");
+        li.innerHTML = value;
+        scrollContent.appendChild(li);
+    }
+    let speedArr = ['normal', 'fast', 'faster'];
+
+    function createVideoBulletChatDom(value) { //将输入框的值插入到弹幕中
+        let num = listTopNum[Math.floor((Math.random() * listTopNum.length))];
+        let p = document.createElement("p");
+        p.setAttribute("class", "video_p");
+        p.style.top = (num * 60) + "px";
+        p.style.left = videoWidth + "px";
+        p.style.animation = "mymove 3s linear";
+        p.innerHTML = value;
+        videoView.appendChild(p);
+
+        let speed = speedArr[Math.floor((Math.random() * speedArr.length))];
+
+        const timerId = setTimeout(() => {
+            p.remove();
+            clearTimeout(timerId);
+        }, 3000);
+        p.timmerId = timerId;
+
+        // 鼠标移入时的操作
+        p.addEventListener("mouseenter", function () {
+            p.style.animationPlayState = "paused";
+            p.style.color = 'red';
+            clearInterval(p.timmerId);
+        }, false);
+
+        // 鼠标移出时的操作
+        p.addEventListener('mouseleave', function () {
+            p.style.animationPlayState = "running";
+            p.style.color = 'white';
+            p.timmerId = setTimeout(() => {
+                p.remove();
+                clearTimeout(timerId);
+            }, 3000)
+        }, false);
+
+    }
+
+
+    // let animateType = {
+    //     'normal': 1,
+    //     'fast': 2,
+    //     'faster': 3
+    // }
+
+    // function Animate(dom, speed) { //滚动动画
+    //     console.log('animate---------');
+    //     let domWidth = dom.offsetWidth; //当前弹幕元素的宽度
+    //     let distance = videoWidth; //直播区域的总宽度
+    //     speed ? speed : 'normal';
+    //     let interval = animateType[speed];
+    //     distance -= interval;
+    //     dom.style.left = distance + 'px';
+    //     if (distance <= -domWidth) {
+    //         videoView.removeChild(dom); //清除已经滚动出屏幕的标签
+    //     }
+    //     requestAnimationFrame(() => Animate(dom, speed));
+    // }
+
+    // function Animate(dom, speed) { //滚动动画
+    //     let domWidth = dom.offsetWidth; //当前弹幕元素的宽度
+    //     let distance = videoWidth; //直播区域的总宽度
+    //     speed ? speed : 'normal';
+    //     let interval = animateType[speed]
+    //     let timer = setInterval(function () {
+    //         distance -= interval;
+    //         dom.style.left = distance + 'px';
+    //         if (distance <= -domWidth) {
+    //             clearInterval(timer);
+    //             videoView.removeChild(dom); //清除已经滚动出屏幕的标签
+    //         }
+    //     }, 20)
+    // }
+
+    // setInterval()
+</script>
+
+</html>
