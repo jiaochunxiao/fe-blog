@@ -14,9 +14,12 @@
     "lib"
   ],
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \"Error: run tests from core\""
   },
   "bugs": {
     "url": "https://github.com/jiaochunxiao/fe-blog/issues"
+  },
+  "dependencies": {
+    "@imooc-cli-dev/utils": "^1.0.0"
   }
 }
