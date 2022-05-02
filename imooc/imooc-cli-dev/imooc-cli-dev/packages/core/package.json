@@ -1,0 +1,22 @@
+{
+  "name": "@imooc-cli-dev/core",
+  "version": "1.0.0",
+  "description": "imooc-cli-dev core",
+  "author": "jiaochunxiao <jcx13627607951@gmail.com>",
+  "homepage": "https://github.com/jiaochunxiao/fe-blog#readme",
+  "license": "ISC",
+  "main": "lib/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "bugs": {
+    "url": "https://github.com/jiaochunxiao/fe-blog/issues"
+  }
+}
