@@ -20,6 +20,6 @@
     "url": "https://github.com/jiaochunxiao/fe-blog/issues"
   },
   "dependencies": {
-    "@imooc-cli-dev/utils": "^1.0.0"
+    "@imooc-cli-dev/utils": "file:../utils"
   }
 }
