@@ -211,5 +211,263 @@ await sequelize.drop();
 console.log("所有表已删除!");
 ```
 
+#### 数据库安全检查
+
+如上所示,sync和drop操作是破坏性的. Sequelize 使用 match 参数作为附加的安全检查,该检查将接受 RegExp：
+```js
+// 仅当数据库名称以 '_test' 结尾时,它才会运行.sync()
+sequelize.sync({ force: true, match: /_test$/ });
+```
+
+#### 生产环境同步
+
+如上所示,sync({ force: true }) 和 sync({ alter: true }) 可能是破坏性操作. 因此,不建议将它们用于生产级软件中. 相反,应该在 Sequelize CLI 的帮助下使用高级概念 Migrations(迁移) 进行同步.
 
 
+### 时间戳
+
+默认情况下,Sequelize 使用数据类型 DataTypes.DATE 自动向每个模型添加 createdAt 和 updatedAt 字段. 这些字段会自动进行管理 - 每当你使用Sequelize 创建或更新内容时,这些字段都会被自动设置. createdAt 字段将包含代表创建时刻的时间戳,而 updatedAt 字段将包含最新更新的时间戳.
+
+
+注意： 这是在 Sequelize 级别完成的(即未使用 SQL触发器 完成). 这意味着直接 SQL 查询(例如,通过任何其他方式在不使用 Sequelize 的情况下执行的查询)将不会导致这些字段自动更新.
+
+对于带有 timestamps: false 参数的模型,可以禁用此行为：
+```js
+sequelize.define('User', {
+  // ... (属性)
+}, {
+  timestamps: false
+});
+```
+
+也可以只启用 createdAt/updatedAt 之一,并为这些列提供自定义名称：
+
+```js
+class Foo extends Model {}
+Foo.init({ /* 属性 */ }, {
+  sequelize,
+
+  // 不要忘记启用时间戳！
+  timestamps: true,
+
+  // 不想要 createdAt
+  createdAt: false,
+
+  // 想要 updatedAt 但是希望名称叫做 updateTimestamp
+  updatedAt: 'updateTimestamp'
+});
+```
+
+### 列声明简写语法
+
+如果关于列的唯一指定内容是其数据类型,则可以缩短语法：
+
+```js
+// 例如:
+sequelize.define('User', {
+  name: {
+    type: DataTypes.STRING
+  }
+});
+
+// 可以简写为:
+sequelize.define('User', { name: DataTypes.STRING });
+```
+
+### 默认值
+
+默认情况下,Sequelize 假定列的默认值为 NULL. 可以通过将特定的 defaultValue 传递给列定义来更改此行为：
+
+```js
+sequelize.define('User', {
+  name: {
+    type: DataTypes.STRING,
+    defaultValue: "John Doe"
+  }
+});
+```
+
+一些特殊的值,例如 DataTypes.NOW,也能被接受：
+
+```js
+sequelize.define('Foo', {
+  bar: {
+    type: DataTypes.DATETIME,
+    defaultValue: DataTypes.NOW
+    // 这样,当前日期/时间将用于填充此列(在插入时)
+  }
+});
+```
+### 数据类型
+
+你在模型中定义的每一列都必须具有数据类型. Sequelize 提供很多内置数据类型. 要访问内置数据类型,必须导入 DataTypes：
+
+```js
+const { DataTypes } = require("sequelize"); // 导入内置数据类型
+```
+
+#### 字符串
+
+```js
+DataTypes.STRING             // VARCHAR(255)
+DataTypes.STRING(1234)       // VARCHAR(1234)
+DataTypes.STRING.BINARY      // VARCHAR BINARY
+DataTypes.TEXT               // TEXT
+DataTypes.TEXT('tiny')       // TINYTEXT
+DataTypes.CITEXT             // CITEXT          仅 PostgreSQL 和 SQLite.
+DataTypes.TSVECTOR           // TSVECTOR        仅 PostgreSQL.
+```
+#### 布尔
+
+```js
+DataTypes.BOOLEAN            // TINYINT(1)
+```
+
+#### 数字
+
+```js
+DataTypes.INTEGER            // INTEGER
+DataTypes.BIGINT             // BIGINT
+DataTypes.BIGINT(11)         // BIGINT(11)
+
+DataTypes.FLOAT              // FLOAT
+DataTypes.FLOAT(11)          // FLOAT(11)
+DataTypes.FLOAT(11, 10)      // FLOAT(11,10)
+
+DataTypes.REAL               // REAL            仅 PostgreSQL.
+DataTypes.REAL(11)           // REAL(11)        仅 PostgreSQL.
+DataTypes.REAL(11, 12)       // REAL(11,12)     仅 PostgreSQL.
+
+DataTypes.DOUBLE             // DOUBLE
+DataTypes.DOUBLE(11)         // DOUBLE(11)
+DataTypes.DOUBLE(11, 10)     // DOUBLE(11,10)
+
+DataTypes.DECIMAL            // DECIMAL
+DataTypes.DECIMAL(10, 2)     // DECIMAL(10,2)
+```
+#### 无符号和零填充整数 - 仅限于MySQL/MariaDB
+
+```js
+DataTypes.INTEGER.UNSIGNED
+DataTypes.INTEGER.ZEROFILL
+DataTypes.INTEGER.UNSIGNED.ZEROFILL
+// 你还可以指定大小,即INTEGER(10)而不是简单的INTEGER
+// 同样适用于 BIGINT, FLOAT 和 DOUBLE
+```
+
+#### 日期
+
+```js
+DataTypes.DATE       // DATETIME 适用于 mysql / sqlite, 带时区的TIMESTAMP 适用于 postgres
+DataTypes.DATE(6)    // DATETIME(6) 适用于 mysql 5.6.4+. 支持6位精度的小数秒
+DataTypes.DATEONLY   // 不带时间的 DATE
+```
+
+#### UUID
+
+对于 UUID,使用 DataTypes.UUID. 对于 PostgreSQL 和 SQLite,它会是 UUID 数据类型;对于 MySQL,它则变成CHAR(36). Sequelize 可以自动为这些字段生成 UUID,只需使用 DataTypes.UUIDV1 或 DataTypes.UUIDV4 作为默认值即可：
+
+```js
+{
+  type: DataTypes.UUID,
+  defaultValue: DataTypes.UUIDV4 // 或 DataTypes.UUIDV1
+}
+```
+
+### 列参数
+
+在定义列时,除了指定列的 type 以及上面提到的 allowNull 和 defaultValue 参数外,还有很多可用的参数. 下面是一些示例.
+
+```js
+const { Model, DataTypes, Deferrable } = require("sequelize");
+
+class Foo extends Model {}
+Foo.init({
+  // 实例化将自动将 flag 设置为 true (如果未设置)
+  flag: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+
+  // 日期的默认值 => 当前时间
+  myDate: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+
+  // 将 allowNull 设置为 false 将为该列添加 NOT NULL,
+  // 这意味着如果该列为 null,则在执行查询时将从数据库引发错误.
+  // 如果要在查询数据库之前检查值是否不为 null,请查看下面的验证部分.
+  title: { type: DataTypes.STRING, allowNull: false },
+
+  // 创建两个具有相同值的对象将引发错误.
+  // unique 属性可以是布尔值或字符串.
+  // 如果为多个列提供相同的字符串,则它们将形成一个复合唯一键.
+  uniqueOne: { type: DataTypes.STRING,  unique: 'compositeIndex' },
+  uniqueTwo: { type: DataTypes.INTEGER, unique: 'compositeIndex' },
+
+  // unique 属性是创建唯一约束的简写.
+  someUnique: { type: DataTypes.STRING, unique: true },
+
+  // 继续阅读有关主键的更多信息
+  identifier: { type: DataTypes.STRING, primaryKey: true },
+
+  // autoIncrement 可用于创建 auto_incrementing 整数列
+  incrementMe: { type: DataTypes.INTEGER, autoIncrement: true },
+
+  // 你可以通过 'field' 属性指定自定义列名称：
+  fieldWithUnderscores: { type: DataTypes.STRING, field: 'field_with_underscores' },
+
+  // 可以创建外键：
+  bar_id: {
+    type: DataTypes.INTEGER,
+
+    references: {
+      // 这是对另一个模型的参考
+      model: Bar,
+
+      // 这是引用模型的列名
+      key: 'id',
+
+      // 使用 PostgreSQL,可以通过 Deferrable 类型声明何时检查外键约束.
+      deferrable: Deferrable.INITIALLY_IMMEDIATE
+      // 参数:
+      // - `Deferrable.INITIALLY_IMMEDIATE` - 立即检查外键约束
+      // - `Deferrable.INITIALLY_DEFERRED` - 将所有外键约束检查推迟到事务结束
+      // - `Deferrable.NOT` - 完全不推迟检查(默认) - 这将不允许你动态更改事务中的规则
+    }
+  },
+
+  // 注释只能添加到 MySQL,MariaDB,PostgreSQL 和 MSSQL 的列中
+  commentMe: {
+    type: DataTypes.INTEGER,
+    comment: '这是带有注释的列'
+  }
+}, {
+  sequelize,
+  modelName: 'foo',
+
+  // 在上面的属性中使用 `unique: true` 与在模型的参数中创建索引完全相同：
+  indexes: [{ unique: true, fields: ['someUnique'] }]
+});
+```
+### 利用模型作为类
+
+Sequelize 模型是 ES6 类. 你可以非常轻松地添加自定义实例或类级别的方法.
+
+```js
+class User extends Model {
+  static classLevelMethod() {
+    return 'foo';
+  }
+  instanceLevelMethod() {
+    return 'bar';
+  }
+  getFullname() {
+    return [this.firstname, this.lastname].join(' ');
+  }
+}
+User.init({
+  firstname: Sequelize.TEXT,
+  lastname: Sequelize.TEXT
+}, { sequelize });
+
+console.log(User.classLevelMethod()); // 'foo'
+const user = User.build({ firstname: 'Jane', lastname: 'Doe' });
+console.log(user.instanceLevelMethod()); // 'bar'
+console.log(user.getFullname()); // 'Jane Doe'
+```
