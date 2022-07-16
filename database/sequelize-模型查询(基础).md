@@ -51,4 +51,35 @@ Model.findAll({
 SELECT foo, bar FROM ...
 ```
 
+可以使用**嵌套数组来重命名属性**：
+
+```js
+Model.findAll({
+  attributes: ['foo', ['bar', 'baz'], 'qux']
+});
+```
+等价于：
+```SQL
+SELECT foo, bar AS baz, qux FROM ...
+```
+
+可以使用**sequelize.fn进行聚合**：
+
+```js
+Model.findAll({
+  attributes: [
+    'foo',
+    [sequelize.fn('COUNT', sequelize.col('hats')), 'n_hats'],
+    'bar'
+  ]
+});
+```
+等价于：
+```SQL
+SELECT  foo, COUNT(hats) AS n_hats, bar FROM ...
+```
+
+使用聚合函数时,必须为它提供一个别名,以便能够从模型中访问它. 在上面的示例中,你可以通过 instance.n_hats 获取帽子数量.
+
+有时，如果只想添加聚合，那么列出模型的所有属性可能会麻烦：
 
