@@ -83,3 +83,61 @@ SELECT  foo, COUNT(hats) AS n_hats, bar FROM ...
 
 有时，如果只想添加聚合，那么列出模型的所有属性可能会麻烦：
 
+```js
+Model.findAll({
+  attributes: [
+    'id', 'foo', 'bar', 'baz', 'qux', 'hats', // 列出模型的所有属性
+    [sequelize.fn('COUNT', sequelize.col('hats')), 'n_hats'], // 添加聚合函数
+  ]
+});
+
+// 这个更短，并且不易出错， 如果以后在模型中添加/删除属性，它仍然可以工作
+Model.findAll({
+  attributes: {
+    include: [
+      [sequelize.fn('COUNT', sequelize.col('hats')), 'n_hats'], // 添加聚合函数
+    ]
+  }
+})
+```
+```SQL
+SELECT id, foo, bar, baz, qux, hats, COUNT(hats) AS n_hats FROM ...
+```
+
+同样，可以排除某些属性：
+
+```js
+Model.findAll({
+  attributes: {
+    exclude: ['foo', 'bar']
+  }
+})
+```
+### 应用 WHERE 子句
+
+where 参数用于过滤查询.where 子句有很多运算符,可以从 Op 中以 Symbols 的形式使用.
+
+#### 基础
+
+```js
+Post.findAll({
+  where: {
+    authorId: 1,
+  }
+})
+// SELECT * FORM post WHERE authorId = 1
+```
+
+可以看到没有显式传递任何运算符(来自Op),因为默认情况下 Sequelize 假定进行相等比较. 上面的代码等效于：
+
+```js
+const { Op } = require("sequelize");
+Post.findAll({
+  where: {
+    authorId: {
+      [Op.eq]: 2
+    }
+  }
+});
+// SELECT * FROM post WHERE authorId = 2;
+```
