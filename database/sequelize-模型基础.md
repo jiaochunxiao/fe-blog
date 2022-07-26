@@ -138,7 +138,7 @@ user.id; // 1
 
 #### 强制表名称等于模型名称
 
-你可以使用 freezeTableName: true 参数停止 Sequelize 执行自动复数化. 这样,Sequelize 将推断表名称等于模型名称,而无需进行任何修改：
+你可以使用 **freezeTableName: true** 参数停止 Sequelize 执行自动复数化. 这样,Sequelize 将推断表名称等于模型名称,而无需进行任何修改：
 
 ```js
 sequelize.define('User', {
