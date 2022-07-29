@@ -79,6 +79,67 @@ const User = sequelize.define('user', {
 注意：在这种情况下,现代数据库应会自动进行一些压缩. 这只是为了举例.
 
 ```javascript
-
+const { gzipSync, gunzipSync } = require('zlib');
+const Post = sequelize.defind('post', {
+  content: {
+    type: DataTypes.TEXT,
+    get() {
+      const storedValue = this.getDataValue('content');
+      const gzippedBuffer = Buffer.from(storedValue, 'base64');
+      const unzipedValue = gunzipSync(gzippedBuffer);
+      return unzipedValue.toString();
+    },
+    set(value) {
+      const gzippedBuffer = gzipSync(value);
+      this.setDataValue('content', gzippedBuffer);
+    }
+  }
+})
 ```
 
+通过上述设置,每当我们尝试与 Post 模型的 content 字段进行交互时,Sequelize 都会自动处理自定义的获取器和设置器. 例如：
+
+```javaScript
+const post = await Post.create({ content: 'Hello everyone!' });
+
+console.log(post.content); // 'Hello everyone!'
+// 一切都在幕后进行,所以我们甚至都可以忘记内容实际上是
+// 作为 gzip 压缩的 base64 字符串存储的！
+
+// 但是,如果我们真的很好奇,我们可以获取 'raw' 数据...
+console.log(post.getDataValue('content'));
+// Output: 'H4sIAAAAAAAACvNIzcnJV0gtSy2qzM9LVQQAUuk9jQ8AAAA='
+```
+
+### 虚拟字段
+
+虚拟字段是 Sequelize 在后台填充的字段,但实际上它们不存在于数据库中.
+
+例如,假设我们有一个 User 的 firstName 和 lastName 属性.
+
+如果有一种简单的方法能直接获取 全名 那会非常好！ 我们可以将 getters 的概念与 Sequelize 针对这种情况提供的特殊数据类型结合使用：DataTypes.VIRTUAL:
+
+```javascript
+const { DataTypes } = require("sequelize");
+
+const User = sequelize.define('user', {
+  firstName: DataTypes.TEXT,
+  lastName: DataTypes.TEXT,
+  fullName: {
+    type: DataTypes.VIRTUAL,
+    get() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+    set(value) {
+      throw new Error('不要尝试设置 `fullName` 的值!');
+    }
+  }
+});
+```
+
+VIRTUAL 字段不会导致数据表也存在此列. 换句话说,上面的模型虽然没有 fullName 列. 但是它似乎存在着！
+
+```javascript
+const user = await User.create({ firstName: 'John', lastName: 'Doe' });
+console.log(user.fullName); // 'John Doe'
+```
