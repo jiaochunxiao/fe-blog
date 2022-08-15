@@ -152,3 +152,31 @@ await sequelize.query(
 ### 绑定参数
 
 绑定参数就像替换. 除非替换被转义并在查询发送到数据库之前通过后续插入到查询中,而将绑定参数发送到SQL查询文本之外的数据库. 查询可以具有绑定参数或替换.绑定参数由 $1, $2, ... (numeric) 或 $key (alpha-numeric) 引用.这是独立于方言的.
+
++ 如果传递一个数组, $1 被绑定到数组中的第一个元素 (bind[0]).
++ 如果传递一个对象, $key 绑定到 object['key']. 每个键必须以非数字字符开始. $1 不是一个有效的键,即使 object['1'] 存在.
++ 在这两种情况下 $$ 可以用来转义一个 $ 字符符号.
+
+数组或对象必须包含所有绑定的值,或者Sequelize将抛出异常. 这甚至适用于数据库可能忽略绑定参数的情况.
+
+数据库可能会增加进一步的限制. 绑定参数不能是SQL关键字,也不能是表或列名. 引用的文本或数据也忽略它们. 在PostgreSQL中,如果不能从上下文 $1::varchar 推断类型,那么也可能需要对其进行类型转换.
+
+```javascript
+const { QueryTypes } = require('sequelize');
+
+await sequelize.query(
+  'SELECT *, "text with literal $$1 and literal $$status" as t FROM projects WHERE status = $1',
+  {
+    bind: ['active'],
+    type: QueryTypes.SELECT
+  }
+);
+
+await sequelize.query(
+  'SELECT *, "text with literal $$1 and literal $$status" as t FROM projects WHERE status = $status',
+  {
+    bind: { status: 'active' },
+    type: QueryTypes.SELECT
+  }
+);
+```
