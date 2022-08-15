@@ -138,5 +138,56 @@ reload 调用生成一个 SELECT 查询,以从数据库中获取最新数据.
 
 ### 仅保存部分字段
 
+通过传递一个列名数组,可以定义在调用 save 时应该保存哪些属性.
 
+当你基于先前定义的对象设置属性时,例如,当你通过 Web 应用程序的形式获取对象的值时,这很有用. 此外,这在 update 实现中内部使用. 它是这样的：
 
+```javascript
+const jane = await User.create({ name: "Jane" });
+console.log(jane.name); // "Jane"
+console.log(jane.favoriteColor); // "green"
+jane.name = "Jane II";
+jane.favoriteColor = "blue";
+await jane.save({ fields: ['name'] });
+console.log(jane.name); // "Jane II"
+console.log(jane.favoriteColor); // "blue"
+// 上面显示为 "blue",因为本地对象将其设置为 "blue",
+// 但是在数据库中它仍然是 "green"：
+await jane.reload();
+console.log(jane.name); // "Jane II"
+console.log(jane.favoriteColor); // "green"
+```
+
+### save的 变化的认识
+
+save方法在内部进行了优化，只更新真正更改的字段。这意味着如果你不改变任何东西并调用save, Sequelize将知道保存是多余的，并且什么也不做，也就是说，不会生成查询(它仍然会返回一个Promise，但它会立即解决)。此外，如果在调用save时只更改了少数属性，则只有这些字段将在UPDATE查询中发送，以提高性能。
+
+### 递增和递减整数值
+
+为了递增/递减实例的值而不会遇到并发问题,Sequelize提供了 increment 和 decrement 实例方法.
+
+```javascript
+const jane = await User.create({ name: "Jane", age: 100 });
+const incrementResult = await jane.increment('age', { by: 2 });
+// 注意: 如只增加 1, 你可以省略 'by' 参数, 只需执行 `user.increment('age')`
+
+// 在 PostgreSQL 中, 除非设置了 `{returning：false}` 参数(不然它将是 undefined),
+// 否则 `incrementResult` 将是更新后的 user.
+
+// 在其它数据库方言中, `incrementResult` 将会是 undefined. 如果你需要更新的实例, 你需要调用 `user.reload()`.
+```
+
+也可以一次递增多个字段:
+
+```javascript
+const jane = await User.create({ name: "Jane", age: 100, cash: 5000 });
+await jane.increment({
+  'age': 2,
+  'cash': 100
+});
+
+// 如果值增加相同的数量,则也可以使用以下其他语法：
+await jane.increment(['age', 'cash'], { by: 2 });
+```
+
+递减的工作原理完全相同.
