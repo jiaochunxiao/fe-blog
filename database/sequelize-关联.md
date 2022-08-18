@@ -508,3 +508,116 @@ console.log(newlyAssociatedBar.name); // 'yet-another-bar'
 await foo.setBar(null); // Un-associate
 console.log(await foo.getBar()); // null
 ```
+
+#### Foo.belongsTo(Bar)
+
+来自 Foo.hasOne(Bar) 的相同内容:
+
++ fooInstance.getBar()
++ fooInstance.setBar()
++ fooInstance.createBar()
+
+#### Foo.hasMany(Bar)
+
++ fooInstance.getBars()
++ fooInstance.countBars()
++ fooInstance.hasBar()
++ fooInstance.hasBars()
++ fooInstance.setBars()
++ fooInstance.addBar()
++ fooInstance.addBars()
++ fooInstance.removeBar()
++ fooInstance.removeBars()
++ fooInstance.createBar()
+
+```javascript
+const foo = await Foo.create({ name: 'the-foo' });
+const bar1 = await Bar.create({ name: 'some-bar' });
+const bar2 = await Bar.create({ name: 'another-bar' });
+console.log(await foo.getBars()); // []
+console.log(await foo.countBars()); // 0
+console.log(await foo.hasBar(bar1)); // false
+await foo.addBars([bar1, bar2]);
+console.log(await foo.countBars()); // 2
+await foo.addBar(bar1);
+console.log(await foo.countBars()); // 2
+console.log(await foo.hasBar(bar1)); // true
+await foo.removeBar(bar2);
+console.log(await foo.countBars()); // 1
+await foo.createBar({ name: 'yet-another-bar' });
+console.log(await foo.countBars()); // 2
+await foo.setBars([]); // 取消关联所有先前关联的 Bars
+console.log(await foo.countBars()); // 0
+```
+
+getter 方法接受参数,就像通常的 finder 方法(例如findAll)一样
+
+```javascript
+const easyTasks = await project.getTasks({
+  where: {
+    difficulty: {
+      [Op.lte]: 5
+    }
+  }
+});
+const taskTitles = (await project.getTasks({
+  attributes: ['title'],
+  raw: true
+})).map(task => task.title);
+```
+
+#### Foo.belongsToMany(Bar, { through: Baz })
+
+来自 Foo.hasMany(Bar) 的相同内容:
+
++ fooInstance.getBars()
++ fooInstance.countBars()
++ fooInstance.hasBar()
++ fooInstance.hasBars()
++ fooInstance.setBars()
++ fooInstance.addBar()
++ fooInstance.addBars()
++ fooInstance.removeBar()
++ fooInstance.removeBars()
++ fooInstance.createBar()
+
+对于 belongsToMany 关系, 默认情况下, getBars() 将返回连接表中的所有字段. 请注意, 任何 include 参数都将应用于目标 Bar 对象, 因此无法像使用 find 方法进行预加载时那样尝试为连接表设置参数. 要选择要包含的连接表的哪些属性, getBars() 支持一个 joinTableAttributes 选项, 其使用类似于在 include 中设置 through.attributes. 例如, 设定 Foo belongsToMany Bar, 以下都将输出没有连接表字段的结果:
+
+```javascript
+const foo = Foo.findByPk(id, {
+  include: [{
+    model: Bar,
+    through: { attributes: [] }
+  }]
+})
+console.log(foo.bars)
+
+const foo = Foo.findByPk(id)
+console.log(foo.getBars({ joinTableAttributes: [] }))
+```
+
+#### 注意: 方法名称
+
+Sequelize 赋予这些特殊方法的名称是由前缀(例如,get,add,set)和模型名称(首字母大写)组成的. 必要时,可以使用复数形式,例如在 fooInstance.setBars() 中. 同样,不规则复数也由 Sequelize 自动处理. 例如,Person 变成 People 或者 Hypothesis 变成 Hypotheses.
+
+如果定义了别名,则将使用别名代替模型名称来形成方法名称. 例如：
+
+```javascript
+Task.hasOne(User, { as: 'Author' });
+```
+
++ taskInstance.getAuthor()
++ taskInstance.setAuthor()
++ taskInstance.createAuthor()
+
+### 为什么关联是成对定义的？
+
+Sequelize 中的关联通常成对定义：
+
++ 创建一个 一对一 关系, hasOne 和 belongsTo 关联一起使用;
++ 创建一个 一对多 关系, hasMany he belongsTo 关联一起使用;
++ 创建一个 多对多 关系, 两个 belongsToMany 调用一起使用.
+
+当在两个模型之间定义了 Sequelize 关联时,只有 源 模型 知晓关系. 因此,例如,当使用 Foo.hasOne(Bar)(当前,Foo 是源模型,而 Bar 是目标模型)时,只有 Foo 知道该关联的存在. 这就是为什么在这种情况下,如上所示,Foo 实例获得方法 getBar(), setBar() 和 createBar() 而另一方面,Bar 实例却没有获得任何方法.
+
+
