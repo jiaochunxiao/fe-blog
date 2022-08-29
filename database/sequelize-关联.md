@@ -620,4 +620,126 @@ Sequelize 中的关联通常成对定义：
 
 当在两个模型之间定义了 Sequelize 关联时,只有 源 模型 知晓关系. 因此,例如,当使用 Foo.hasOne(Bar)(当前,Foo 是源模型,而 Bar 是目标模型)时,只有 Foo 知道该关联的存在. 这就是为什么在这种情况下,如上所示,Foo 实例获得方法 getBar(), setBar() 和 createBar() 而另一方面,Bar 实例却没有获得任何方法.
 
+类似地,对于 Foo.hasOne(Bar),由于 Foo 了解这种关系,我们可以像 Foo.findOne({ include: Bar }) 中那样执行预先加载,但不能执行 Bar.findOne({ include: Foo })。
 
+因此,为了充分发挥 Sequelize 的作用,我们通常成对设置关系,以便两个模型都 互相知晓.
+
++ 如果我们未定义关联对,则仅调用 Foo.hasOne(Bar):
+
+```javascript
+// 这有效...
+await Foo.findOne({ include: Bar });
+
+// 但这会引发错误:
+await Bar.findOne({ include: Foo });
+// SequelizeEagerLoadingError: foo is not associated to bar!
+```
+
++ 如果我们按照建议定义关联对, 即, Foo.hasOne(Bar) 和 Bar.belongsTo(Foo):
+
+```javascript
+// 这有效
+await Foo.findOne({ include: Bar });
+
+// 这也有效!
+await Bar.findOne({ include: Foo });
+```
+
+### 涉及相同模型的多个关联
+
+在 Sequelize 中,可以在同一模型之间定义多个关联. 你只需要为它们定义不同的别名：
+
+
+```javascript
+Team.hasOne(Game, { as: 'HomeTeam', foreignKey: 'homeTeamId' });
+Team.hasOne(Game, { as: 'AwayTeam', foreignKey: 'awayTeamId' });
+Game.belongsTo(Team);
+```
+
+### 创建引用非主键字段的关联
+
+Sequelize 允许你定义一个关联,该关联使用另一个字段而不是主键字段来建立关联.
+
+此其他字段必须对此具有唯一的约束(否则,这将没有意义).
+
+#### 对于 belongsTo 关系
+
+首先,回想一下 A.belongsTo(B) 关联将外键放在 源模型 中(即,在 A 中).
+
+让我们再次使用"船和船长"的示例. 此外,我们将假定船长姓名是唯一的：
+
+```javascript
+const Ship = sequelize.define('ship', { name: DataTypes.STRING }, { timestamps: false });
+const Captain = sequelize.define('captain', {
+  name: { type: DataTypes.STRING, unique: true }
+}, { timestamps: false });
+```
+
+这样,我们不用在 Ship 上保留 captainId,而是可以保留 captainName 并将其用作关联跟踪器. 换句话说,我们的关系将引用目标模型上的另一列：name 列,而不是从目标模型(Captain)中引用 id. 为了说明这一点,我们必须定义一个 目标键. 我们还必须为外键本身指定一个名称：
+
+```javascript
+Ship.belongsTo(Captain, { targetKey: 'name', foreignKey: 'captainName' });
+// 这将在源模型(Ship)中创建一个名为 `captainName` 的外键,
+// 该外键引用目标模型(Captain)中的 `name` 字段.
+```
+
+```javascript
+await Captain.create({ name: "Jack Sparrow" });
+const ship = await Ship.create({ name: "Black Pearl", captainName: "Jack Sparrow" });
+console.log((await ship.getCaptain()).name); // "Jack Sparrow"
+```
+
+#### 对于 hasOne 和 hasMany 关系
+
+可以将完全相同的想法应用于 hasOne 和 hasMany 关联,但是在定义关联时,我们提供了 sourceKey,而不是提供 targetKey. 这是因为与 belongsTo 不同,hasOne 和 hasMany关联将外键保留在目标模型上：
+
+```javascript
+const Foo = sequelize.define('foo', {
+  name: { type: DataTypes.STRING, unique: true }
+}, { timestamps: false });
+const Bar = sequelize.define('bar', {
+  title: { type: DataTypes.STRING, unique: true }
+}, { timestamps: false });
+```
+
+有四种情况需要考虑：
+
++ 我们可能希望使用默认的主键为 Foo 和 Bar 进行多对多关系：
+
+```javascript
+Foo.belongsToMany(Bar, { through: 'foo_bar' });
+// 这将创建具有字段 `fooId` 和 `barID` 的联结表 `foo_bar`.
+```
+
++ 我们可能希望使用默认主键 Foo 的多对多关系,但使用 Bar 的不同字段：
+
+```javascript
+Foo.belongsToMany(Bar, { through: 'foo_bar', targetKey: 'title' });
+// 这将创建具有字段 `fooId` 和 `barTitle` 的联结表 `foo_bar`.
+```
+
++ 我们可能希望使用 Foo 的不同字段和 Bar 的默认主键进行多对多关系
+
+```javascript
+Foo.belongsToMany(Bar, { through: 'foo_bar', sourceKey: 'name' });
+// 这将创建具有字段 `fooName` 和 `barId` 的联结表 `foo_bar`.
+```
+
++ 我们可能希望使用不同的字段为 Foo 和 Bar 使用多对多关
+
+```javascript
+Foo.belongsToMany(Bar, { through: 'foo_bar', sourceKey: 'name', targetKey: 'title' });
+// 这将创建带有字段 `fooName` 和 `barTitle` 的联结表 `foo_bar`.
+```
+
+#### 注意
+
+不要忘记关联中引用的字段必须具有唯一性约束. 否则,将引发错误(对于 SQLite 有时还会发出诡异的错误消息,例如 SequelizeDatabaseError: SQLITE_ERROR: foreign key mismatch - "ships" referencing "captains").
+
+在 sourceKey 和 targetKey 之间做出决定的技巧只是记住每个关系在何处放置其外键. 如本指南开头所述：
+
++ A.belongsTo(B) 将外键保留在源模型中(A),因此引用的键在目标模型中,因此使用了 targetKey.
+
++ A.hasOne(B) 和 A.hasMany(B) 将外键保留在目标模型(B)中,因此引用的键在源模型中,因此使用了 sourceKey.
+
++ A.belongsToMany(B) 包含一个额外的表(联结表),因此 sourceKey 和 targetKey 均可用,其中 sourceKey 对应于A(源)中的某个字段而 targetKey 对应于 B(目标)中的某个字段.
