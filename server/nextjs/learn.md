@@ -158,3 +158,154 @@ export default function Layout ({ auth }: { auth: React.ReactNode }) {
 ```
 
 当用户导航到 app/@auth/login (或 URL 栏中的 /login) 时，loginSegment 将等于字符串 "login"。
+
+
+#### 拦截路由
+
+拦截路由允许您在当前布局中加载应用程序其他部分的路由。当您想在不切换用户上下文的情况下显示路由内容时，这种路由范式非常有用。
+
+
+#### Route Handlers 路由处理程序
+
+路由处理程序允许你使用 Web 的 Request 和 Response API 为给定路由创建自定义请求处理程序。
+
+> 路由处理程序仅在 app 目录中可用。它们相当于 pages 目录中的 API 路由，这意味着你不需要同时使用 API 路由和路由处理程序。
+
+
+##### 约定
+
+路由处理程序在 app 目录中的 route.js|ts 文件中定义:
+
+```tsx
+// app/hello/route.js
+export async function GET(request: Request){}
+```
+
+支持以下 HTTP 方法: GET、POST、PUT、PATCH、DELETE、HEAD 和 OPTIONS。如果调用了不支持的方法，Next.js 将返回 405 Method Not Allowed 响应。
+
+
+##### 行为
+
+**缓存**
+
+路由处理程序默认不会被缓存。但是，你可以为 GET 方法选择启用缓存。要做到这一点，可以在路由处理程序文件中使用 路由配置选项，比如 export const dynamic = 'force-static'。
+
+```ts
+export const dynamic = 'force-static';
+
+export async function GET() {
+  const res = await fetch('https://api.example.com/data', {
+    headers: {
+      'Content-Type': 'application/json',
+      'API-Key': process.env.DATA_API_KEY,
+    }
+  });
+
+  const data = await res.json();
+  return Response.json({ data });
+}
+```
+
+**特殊路由处理程序**
+
+像 sitemap.ts、opengraph-image.tsx 和 icon.tsx 这样的特殊路由处理程序，以及其他 元数据文件 默认情况下仍然是静态的，除非它们使用动态函数或动态配置选项。
+
+**路由解析**
+
+
+
+
+你可以将 route 视为最低级别的路由语言。
+
++ 它们不参与布局或客户端导航，不像 page。
++ 在同一路由上不能同时存在 route.js 文件和 page.js 文件。
+
+
+|页面	|路由	|结果|
+|----|----|----|
+|app/page.js|app/route.js|冲突|
+|app/page.js|app/api/route.js|有效|
+|app/[user]/page.js|app/api/route.js|有效|
+
+
+每个 route.js 或 page.js 文件都会接管该路由的所有 HTTP 动词
+
+```js
+export default function Page() {
+  return <h1>你好，Next.js！</h1>;
+}
+
+// ❌ 冲突
+// `app/route.js`
+export async function POST(request) {}
+```
+
+##### Cookies
+
+你可以使用 next/headers 中的 cookies 读取或设置 cookies。这个服务器函数可以直接在路由处理程序中调用，也可以嵌套在另一个函数中。
+
+或者，你可以使用 Set-Cookie 头部返回一个新的 Response。
+
+```ts
+import { cookies } from 'next/headers';
+
+export async function GET(request: Request) {
+  const cookieStore = cookies();
+  const token = cookieStore.get('token');
+
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: {
+      'Set-Cookie': `token=${token.value}; HttpOnly; Secure; SameSite=Strict`,
+    },
+  });
+}
+```
+
+也可以使用底层的 Web API 从请求(NextRequest)中读取cookies:
+
+```ts
+import { type NextRequest } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get('token');
+
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: {
+      'Set-Cookie': `token=${token}; HttpOnly; Secure; SameSite=Strict`,
+    },
+  });
+}
+```
+
+##### headers
+
+你可以使用 next/headers 中的 headers 读取 headers。这个服务器函数可以直接在路由处理程序中调用，也可以嵌套在另一个函数中。
+
+这个 headers 实例是只读的。要设置 headers，你需要返回一个带有新 headers 的新 Response。
+
+```ts
+import { headers } from 'next/headers';
+
+export async function GET(request: Request) {
+  const headersList = headers();
+  const referer = headersList.get('referer');
+
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: {
+      'Referer': referer,
+    },
+  });
+}
+```
+也可以使用底层的 Web API 从请求 (NextRequest) 中读取 headers:
+
+```ts
+import { type NextRequest } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const requestHeaders = new Headers(request.headers);
+}
+```
