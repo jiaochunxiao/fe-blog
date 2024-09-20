@@ -309,3 +309,112 @@ export async function GET(request: NextRequest) {
   const requestHeaders = new Headers(request.headers);
 }
 ```
+
+##### 重定向
+
+```ts
+import { redirect } from 'next/headers';
+
+export async function GET(request: Request) {
+  return redirect('/new-location');
+}
+```
+
+##### 动态路由段
+
+路由处理程序可以使用 动态段 来创建基于动态数据的请求处理程序。
+
+```ts
+// app/items/[slug]/route.ts
+
+export async function GET(request: Request, { params } : { params: { slug: string } }) {
+  const { slug } = params;
+  const item = await fetch(`https://api.example.com/items/${slug}`);
+  return Response.json({ item });
+}
+```
+
+##### URL 查询参数
+
+```ts
+// app/api/search/route.ts
+import { type NextRequest } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const query = searchParams.get('q');
+  const results = await fetch(`https://api.example.com/search?q=${query}`);
+  return Response.json({ results });
+}
+```
+
+##### 流式传输
+
+流式传输通常与大语言模型 (LLMs) 结合使用，例如 OpenAI，用于 AI 生成的内容。
+
+```ts
+// app/api/chat/route.ts
+import { openai } from "ai-sdk/openai";
+import { StreamingTextResponse, streamText } from 'ai';
+
+export async function POST(request: Request) {
+  const { messages } = await req.json();
+  const result = await streamText({
+    model: openai('gpt-4-turbo'),
+    messages,
+  })
+  return new StreamingTextResponse(result.toAIStream());
+}
+```
+
+也可以直接使用底层的 Web API。
+
+```ts
+// app/api/chat/route.ts
+function iteratorToStream(iterator: any) {
+  return new ReadableStream({
+    async pull(controller) {
+      const {value, done} = await iterator.next();
+      if (done) {
+        controller.close();
+      } else {
+        controller.enqueue(value);
+      }
+    }
+  })
+}
+
+function sleep(time: number) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
+
+const encoder = new TextEncoder();
+
+async function* makeIterator() {
+  yield encoder.encode('<p>第一个</p>');
+  await sleep(200);
+  yield encoder.encode('<p>第二个</p>');
+  await sleep(200);
+  yield encoder.encode('<p>第三个</p>');
+}
+
+export async function GET() {
+  const iterator = makeIterator();
+
+  const stream = iteratorToStream(iterator);
+  return new Response(stream);
+}
+```
+
+##### 请求体
+
+可以使用标准的 Web API 方法读取 Request 体：
+
+```ts
+// app/items/routes.ts
+export async function POST(request: Request) {
+  const res = await request.json();
+  return Response.json(res);
+}
+```
+
