@@ -418,3 +418,215 @@ export async function POST(request: Request) {
 }
 ```
 
+##### 请求体 FormData
+
+可以使用 request.formData() 函数读取 FormData：
+
+```ts
+export async function POST(req: NextRequest) {
+  const formData = await req.formData()
+  const data: Record<string, FormDataEntryValue> = {}
+  for (const [key, value] of formData) {
+    data[key] = value
+  }
+  return NextResponse.json({ data }, { status: 200 })
+}
+```
+
+##### CORS
+
+
+##### Webhooks
+
+
+可以使用路由处理程序来接收来自第三方服务的 webhooks：
+
+```ts
+export async function POST(request: Request) {
+  try {
+    const text = await request.text();
+    // 处理 webhook 负载
+  }
+  catch (error) {
+    return new Response(`Webhook 错误: ${error.message}`, { status: 400 });
+  }
+
+  return new Response('成功', { status: 200 });
+}
+```
+
+##### 非UI响应
+
+可以使用路由处理程序返回非 UI 内容。注意，sitemap.xml、robots.txt、app icons 和 open graph 图片 都有内置支持。
+
+```ts
+// app/rss.xml/route.ts
+export async function GET(request: Request) {
+  return new Response(
+    `<?xml version="1.0" encoding="UTF-8"?>
+    <rss version="2.0">
+      <channel>
+        <title>Example Feed</title>
+        <link>http://example.com/</link>
+        <description>Example feed description</description>
+      </channel>
+    </rss>`,
+    {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    }
+  )
+}
+```
+
+
+#### Middleware 中间件
+
+中间件允许你在请求完成之前运行代码。然后,基于传入的请求,你可以通过重写、重定向、修改请求或响应头,或直接响应来修改响应。
+
+中间件在缓存内容和路由匹配之前运行。
+
+##### 用例
+
+将中间件集成到你的应用程序中可以显著提高性能、安全性和用户体验。以下是中间件特别有效的一些常见场景:
+
++ 身份验证和授权: 在授予对特定页面或 API 路由的访问权限之前,确保用户身份并检查会话 cookie。
++ 服务器端重定向: 根据某些条件 (例如语言环境、用户角色) 在服务器级别重定向用户。
++ 路径重写: 通过根据请求属性动态重写 API 路由或页面的路径,支持 A/B 测试、功能推出或旧路径。
++ 机器人检测: 通过检测和阻止机器人流量来保护你的资源。
++ 日志和分析: 在页面或 API 处理之前捕获和分析请求数据以获取洞察。
++ 功能标记: 动态启用或禁用功能,以实现无缝功能推出或测试。
+
+认识到中间件可能不是最佳方法的情况同样重要。以下是一些需要注意的场景:
+
++ 复杂的数据获取和操作: 中间件并非设计用于直接数据获取或操作,这应该在路由处理程序或服务器端实用程序中完成。
++ 繁重的计算任务: 中间件应该轻量级并快速响应,否则可能导致页面加载延迟。繁重的计算任务或长时间运行的进程应该在专用的路由处理程序中完成。
++ 广泛的会话管理: 虽然中间件可以管理基本的会话任务,但广泛的会话管理应由专门的身份验证服务或路由处理程序管理。
++ 直接数据库操作: 不建议在中间件中执行直接数据库操作。数据库交互应在路由处理程序或服务器端实用程序中完成。
+
+##### 示例
+
+```ts
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+
+export function middleware(req: NextRequest) {
+  console.log('--user---middleware.ts', req.nextUrl.pathname);
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/api/hello',
+}
+```
+
+##### 匹配路径
+
+中间件将对你项目中的 每个路由 调用。考虑到这一点,使用匹配器精确定位或排除特定路由至关重要。以下是执行顺序:
+
++ 来自 next.config.js 的 headers
++ 来自 next.config.js 的 redirects
++ 中间件 (rewrites、redirects 等)
++ 来自 next.config.js 的 beforeFiles (rewrites)
++ 文件系统路由 (public/、_next/static/、pages/、app/ 等)
++ 来自 next.config.js 的 afterFiles (rewrites)
++ 动态路由 (/blog/[slug])
++ 来自 next.config.js 的 fallback (rewrites)
+
+##### 匹配器
+
+matcher 允许你过滤中间件以在特定路径上运行。
+
+```ts
+export const config = {
+  matcher: '/api/:path*',
+}
+
+// 以使用数组语法匹配单个路径或多个路径:
+export const config = {
+  matcher: ['/about/:path*', '/dashboard/:path*'],
+}
+
+// matcher 配置允许使用完整的正则表达式,因此支持匹配负向前瞻或字符匹配。这里是一个使用负向前瞻来匹配除特定路径之外的所有路径的
+export const config = {
+  matcher: [
+    /*
+     * 匹配所有请求路径,除了以下开头的路径:
+     * - api (API 路由)
+     * - _next/static (静态文件)
+     * - _next/image (图像优化文件)
+     * - favicon.ico (网站图标文件)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+  ],
+}
+
+// 也可以使用 missing 或 has 数组,或两者的组合来绕过某些请求的中间件:
+export const config = {
+  matcher: [
+    /*
+     * 匹配所有请求路径,除了以下开头的路径:
+     * - api (API 路由)
+     * - _next/static (静态文件)
+     * - _next/image (图像优化文件)
+     * - favicon.ico (网站图标文件)
+     */
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      has: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
+
+    {
+      source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+      has: [{ type: "header", key: "x-present" }],
+      missing: [{ type: "header", key: "x-missing", value: "prefetch" }],
+    },
+  ],
+};
+```
+ > matcher 值需要是常量,以便可以在构建时进行静态分析。动态值 (如变量) 将被忽略。
+
+配置的匹配器:
+
++ 必须以 / 开头
++ 可以包含命名参数: /about/:path 匹配 /about/a 和 /about/b,但不匹配 /about/a/c
++ 可以在命名参数上有修饰符 (以 : 开头): /about/:path* 匹配 /about/a/b/c,因为 * 是 零个或多个。? 是 零个或一个,+ 是 一个或多个
++ 可以使用括号中的正则表达式: /about/(.*) 与 /about/:path* 相同
+
+> 为了向后兼容,Next.js 始终将 /public 视为 /public/index。因此,匹配器 /public/:path 将匹配。
+
+##### NextResponse
+
+
+NextResponse API 允许你:
+
++ redirect 将传入请求重定向到不同的 URL
++ rewrite 通过显示给定 URL 来重写响应
++ 为 API 路由、getServerSideProps 和 rewrite 目标设置请求头
++ 设置响应 cookie
++ 设置响应头
+
+要从中间件生成响应,你可以:
+
++ rewrite 到生成响应的路由 (页面 或 路由处理程序)
++ 直接返回 NextResponse
+
+
+##### 使用 Cookies
+
+Cookies 是常规头部。在 Request 上,它们存储在 Cookie 头部中。在 Response 上,它们存储在 Set-Cookie 头部中。Next.js 通过 NextRequest 和 NextResponse 上的 cookies 扩展提供了一种方便的方式来访问和操作这些 cookies。
+
++ 对于传入的请求,cookies 具有以下方法: get、getAll、set 和 delete cookies。你可以使用 has 检查 cookie 是否存在,或使用 clear 删除所有 cookies。
++ 对于传出的响应,cookies 具有以下方法: get、getAll、set 和 delete。
